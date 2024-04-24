@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="hr_payroll_edit_payslip_lines_form_wizard_pt" model="ir.ui.view">
+        <field name="name">hr.payroll.edit.payslip.lines.wizard.view.form.pt</field>
+        <field name="model">hr.payroll.edit.payslip.lines.wizard</field>
+        <field
+            name="inherit_id"
+            ref="hr_payroll_edit_lines.hr_payroll_edit_payslip_lines_form_wizard"
+        />
+        <field name="arch" type="xml">
+            <field name="total" position="after">
+                <field name="l10n_pt_amount_subject_to_it" optional="hide" />
+                <field name="l10n_pt_amount_exempt_to_it" optional="hide" />
+                <field name="l10n_pt_amount_subject_to_ss" optional="hide" />
+            </field>
+            <xpath
+                expr="//field[@name='line_ids']/tree/field[@name='quantity']"
+                position="attributes"
+            >
+            <attribute
+                    name="attrs"
+                >{'readonly': [('code', 'in' , ['SUBS_NAT_TRIBUTADO', 'SUBS_FER_TRIBUTADO', 'SS_EP', 'SS', 'IRS_SOMA_BASE', 'IRS_SOMA_BASE_TOTAL', 'IRS', 'T_RECEBER_TIC', 'NET', 'T_DES'])]}</attribute>
+            </xpath>
+
+            <xpath
+                expr="//field[@name='line_ids']/tree/field[@name='amount']"
+                position="attributes"
+            >
+                <attribute
+                    name="attrs"
+                >{'readonly': [('code', 'in' , ['SUBS_NAT_TRIBUTADO', 'SUBS_FER_TRIBUTADO', 'SS_EP', 'SS', 'IRS_SOMA_BASE', 'IRS_SOMA_BASE_TOTAL', 'IRS', 'T_RECEBER_TIC', 'NET', 'T_DES'])]}</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
