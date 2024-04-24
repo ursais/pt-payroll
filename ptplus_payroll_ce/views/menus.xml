@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <menuitem
+        id="ptplus_payroll_settings_menu"
+        name="Portugal"
+        parent="payroll.payroll_menu_configuration"
+        sequence="999"
+        groups="payroll.group_payroll_manager"
+    >
+    </menuitem>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_income_tax_pt_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_insurance_company_pt_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_profession_pt_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_qualification_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_professional_category_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record
+        model="ir.ui.menu"
+        id="ptplus_payroll.menu_hr_social_security_tax_pt_action"
+    >
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_tax_office_pt_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <!-- Input template -->
+    <menuitem
+        id="menu_hr_payslip_input_template_view"
+        action="hr_payslip_input_template_view_action"
+        parent="payroll.payroll_menu_configuration"
+        name="Other Input Templates"
+        sequence="40"
+    />
+
+    <!-- Reports -->
+    <menuitem
+        id="payroll_menu_report"
+        name="Reports"
+        parent="payroll.payroll_menu_root"
+        sequence="90"
+        groups="payroll.group_payroll_manager"
+    />
+    <menuitem
+        id="payroll_menu_report_pt"
+        name="Portugal"
+        parent="payroll_menu_report"
+        groups="payroll.group_payroll_manager"
+    />
+
+</odoo>
