@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+
+        <record id="not_married_pt" model="hr.marital.status.pt">
+            <field name="name">Not Married</field>
+        </record>
+
+        <record id="married_one_holder_pt" model="hr.marital.status.pt">
+            <field name="name">Married One Holder</field>
+        </record>
+
+        <record id="married_two_holders_pt" model="hr.marital.status.pt">
+            <field name="name">Married Two Holder</field>
+        </record>
+
+    </data>
+</odoo>
