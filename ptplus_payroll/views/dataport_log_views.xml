@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="view_dataport_log_filter" model="ir.ui.view">
+        <field name="name">dataport.log.select</field>
+        <field name="model">dataport.log</field>
+        <field name="inherit_id" ref="ptplus.view_dataport_log_filter" />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='type_saft']" position="after">
+                <filter
+                    name="type_payroll_dmr"
+                    string="DMR"
+                    domain="[('type','=', 'payroll.dmr')]"
+                />
+                <filter
+                    name="type_payroll_dri"
+                    string="DRI"
+                    domain="[('type','=', 'payroll.dri')]"
+                />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

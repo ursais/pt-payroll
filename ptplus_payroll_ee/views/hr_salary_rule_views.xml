@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+
+        <record id="hr_salary_rule_form_pt" model="ir.ui.view">
+            <field name="name">hr.salary.rule.pt</field>
+            <field name="model">hr.salary.rule</field>
+            <field name="inherit_id" ref="hr_payroll.hr_salary_rule_form" />
+            <field name="arch" type="xml">
+                <field name="active" position="after">
+                    <field name="country_code" invisible="1" />
+                    <field name="l10n_pt_standard_rule" invisible="1" />
+                    <field name="l10n_pt_category_code" invisible="1" />
+                </field>
+                <xpath expr="//notebook" position="inside">
+                    <page
+                        name="pt_rule_information"
+                        string="PT Rule Information"
+                        attrs="{'invisible': [('country_code' ,'!=', 'PT')]}"
+                    >
+                        <group>
+                            <group string="Codes for Tax Returns">
+                                <field name="l10n_pt_dri_subject_amount" />
+                                <field name="l10n_pt_dmr_subject_amount" />
+                                <field name="l10n_pt_dmr_exempt_amount" />
+                            </group>
+                            <group string="Other Information">
+                                <field name="l10n_pt_description_on_payslip" />
+                                <field name="l10n_pt_affects_income_tax" attrs="{'readonly': [('l10n_pt_standard_rule', '=', True)]}"/>
+                                <field name="l10n_pt_affects_temr" attrs="{'readonly': [('l10n_pt_standard_rule', '=', True)]}"/>
+                                <field name="l10n_pt_affects_holiday_allowance"
+                                   attrs="{'invisible': [('l10n_pt_category_code' ,'!=', 'ABONO')]}"/>
+                                <field name="l10n_pt_affects_christmas_allowance"
+                                   attrs="{'invisible': [('l10n_pt_category_code' ,'!=', 'ABONO')]}"/>
+                                <field name="l10n_pt_affects_hourly_wage"
+                                    attrs="{'invisible': [('l10n_pt_category_code' ,'!=', 'ABONO')]}"/>
+                                <field name="l10n_pt_affects_overtime_hourly_wage"
+                                    attrs="{'invisible': [('l10n_pt_category_code' ,'!=', 'ABONO')]}"/>
+                                <field name="l10n_pt_affects_holiday"
+                                   attrs="{'invisible': [('l10n_pt_category_code' ,'!=', 'ABONO')]}"/>
+                                <field name="l10n_pt_monthly_income"
+                                    attrs="{'invisible': [('l10n_pt_category_code' ,'!=', 'ABONO')]}"/>
+                                <field name="l10n_pt_proportional_allowance"
+                                       attrs="{'invisible': [('l10n_pt_category_code' ,'!=', 'ABONO')]}"/>
+                                <field name="l10n_pt_paid_in_kind" attrs="{'readonly': [('l10n_pt_standard_rule', '=', True)],
+                                        'invisible': [('l10n_pt_category_code' ,'!=', 'ABONO')]}"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+
+                <xpath
+                    expr="//page[@name='accounting']/group/field[@name='not_computed_in_net']"
+                    position="before"
+                >
+                    <field
+                        name="l10n_pt_account_debit_corporate_body"
+                        attrs="{'invisible': [('country_code' ,'!=', 'PT')]}"
+                    />
+                    <field
+                        name="l10n_pt_account_credit_corporate_body"
+                        attrs="{'invisible': [('country_code' ,'!=', 'PT')]}"
+                    />
+                </xpath>
+
+                <field name="code" position="attributes">
+                    <attribute
+                        name="attrs"
+                    >{'readonly': [('l10n_pt_standard_rule', '=', True)]}</attribute>
+                </field>
+                <field name="condition_python" position="attributes">
+                    <attribute
+                        name="attrs"
+                    >{'readonly': [('l10n_pt_standard_rule', '=', True)]}</attribute>
+                </field>
+                <field name="amount_python_compute" position="attributes">
+                    <attribute
+                        name="attrs"
+                    >{'readonly': [('l10n_pt_standard_rule', '=', True)]}</attribute>
+                </field>
+                <field name="condition_select" position="attributes">
+                    <attribute
+                        name="attrs"
+                    >{'readonly': [('l10n_pt_standard_rule', '=', True)]}</attribute>
+                </field>
+                <field name="amount_select" position="attributes">
+                    <attribute
+                        name="attrs"
+                    >{'readonly': [('l10n_pt_standard_rule', '=', True)]}</attribute>
+                </field>
+                <field name="l10n_pt_dri_subject_amount" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly': [
+                            ('l10n_pt_standard_rule', '=', True),
+                            ('code', 'not in', ['IND_CESS_CONT', 'IND_CESS_CONT_NAO_SS_SUJ_IRS', 'IND_CESS_CONT_NAO_SS_NAO_IRS'])]
+                         }
+                    </attribute>
+                </field>
+                <field name="l10n_pt_dmr_subject_amount" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly': [
+                            ('l10n_pt_standard_rule', '=', True),
+                            ('code', 'not in', ['IND_CESS_CONT', 'IND_CESS_CONT_NAO_SS_SUJ_IRS', 'IND_CESS_CONT_NAO_SS_NAO_IRS'])]
+                         }
+                    </attribute>
+                </field>
+                <field name="l10n_pt_dmr_exempt_amount" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly': [
+                            ('l10n_pt_standard_rule', '=', True),
+                            ('code', 'not in', ['IND_CESS_CONT', 'IND_CESS_CONT_NAO_SS_SUJ_IRS', 'IND_CESS_CONT_NAO_SS_NAO_IRS'])]
+                         }
+                    </attribute>
+                </field>
+                <field name="sequence" position="attributes">
+                    <attribute
+                        name="attrs"
+                    >{'readonly': [('l10n_pt_standard_rule', '=', True)]}</attribute>
+                </field>
+                <field name="appears_on_payslip" position="attributes">
+                    <attribute
+                        name="attrs"
+                    >{'readonly': [('l10n_pt_standard_rule', '=', True)]}</attribute>
+                </field>
+                <field name="name" position="attributes">
+                    <attribute
+                        name="attrs"
+                    >{'readonly': [('l10n_pt_standard_rule', '=', True)]}</attribute>
+                </field>
+                <field name="category_id" position="attributes">
+                    <attribute
+                        name="attrs"
+                    >{'readonly': [('l10n_pt_standard_rule', '=', True)]}</attribute>
+                </field>
+                <field name="struct_id" position="attributes">
+                    <attribute
+                        name="attrs"
+                    >{'readonly': [('l10n_pt_standard_rule', '=', True)]}</attribute>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>
