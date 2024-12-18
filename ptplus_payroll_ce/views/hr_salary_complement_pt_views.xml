@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!--    this is a duplicated file-->
+    <record id="hr_salary_complement_pt_view_search" model="ir.ui.view">
+        <field name="name">hr.salary.complement.pt.search</field>
+        <field name="model">hr.salary.complement.pt</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id" />
+                <field name="input_template_id" />
+            </search>
+        </field>
+    </record>
+
+    <record id="hr_salary_complement_pt_view_tree" model="ir.ui.view">
+        <field name="name">hr.salary.complement.pt.tree</field>
+        <field name="model">hr.salary.complement.pt</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="employee_id" optional="show" />
+                <field name="input_template_id" optional="show" />
+                <field name="is_attachment" optional="show" />
+                <field name="date_start" optional="show" />
+                <field name="date_stop" optional="show" />
+                <field name="monthly_value" optional="show" />
+                <field name="amount_of_attachment" optional="show" />
+                <field name="amount_already_attached" optional="hide" />
+                <field name="amount_to_be_attached" optional="hide" />
+                <field name="state" optional="show" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_salary_complement_pt_view_form" model="ir.ui.view">
+        <field name="name">hr.salary.complement.pt.form</field>
+        <field name="model">hr.salary.complement.pt</field>
+        <field name="arch" type="xml">
+            <form string="Salary Complement">
+                <header>
+                    <button
+                        name="action_completed"
+                        type="object"
+                        string="Completed"
+                        states="running,cancelled"
+                    />
+                    <button
+                        name="action_running"
+                        type="object"
+                        string="Running"
+                        states="completed,cancelled"
+                    />
+                    <button
+                        name="action_cancelled"
+                        type="object"
+                        string="cancelled"
+                        states="running"
+                    />
+                    <field
+                        name="state"
+                        widget="statusbar"
+                        statusbar_visible="running,completed"
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button
+                            type="object"
+                            name="action_open_payslips"
+                            class="oe_stat_button"
+                            icon="fa-money"
+                            id="open_payslips"
+                            attrs="{'invisible': [('payslip_count', '=', 0)]}"
+                        >
+                            <field
+                                name="payslip_count"
+                                widget="statinfo"
+                                string="Payslips"
+                            />
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="employee_id" />
+                        <h1><field
+                                name="employee_id"
+                                attrs="{'readonly': [('state', '=', 'completed')]}"
+                            /></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field
+                                name="description"
+                                attrs="{'readonly': [('state', '=', 'completed')]}"
+                            />
+                            <field
+                                name="is_attachment"
+                                attrs="{'readonly': [('state', '=', 'completed')]}"
+                            />
+                            <field
+                                name="input_template_id"
+                                attrs="{'readonly': [('state', '=', 'completed')]}"
+                            />
+                            <field
+                                name="monthly_value"
+                                attrs="{'invisible': [('is_attachment', '=', True)], 'readonly': [('state', '=', 'completed')]}"
+                            />
+                            <field
+                                name="amount_of_attachment"
+                                attrs="{'invisible': [('is_attachment', '=', False)], 'readonly': [('state', '=', 'completed')]}"
+                            />
+                        </group>
+                        <group>
+                            <field
+                                name="date_start"
+                                attrs="{'readonly': [('state', '=', 'completed')]}"/>
+                            <field name="date_of_communication_of_attachment" attrs="{'invisible': [('is_attachment', '=', False)], 'required': [('is_attachment', '=', True)]}"/>
+                            />
+                            <field
+                                name="date_stop"
+                                attrs="{'invisible': [('is_attachment', '=', True)], 'readonly': [('state', '=', 'completed')]}"
+                            />
+                            <field
+                                name="amount_already_attached"
+                                attrs="{'invisible': [('is_attachment', '=', False)]}"
+                            />
+                            <field
+                                name="amount_to_be_attached"
+                                attrs="{'invisible': [('is_attachment', '=', False)]}"
+                            />
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field
+                        name="message_follower_ids"
+                        widget="mail_followers"
+                        groups="base.group_user"
+                    />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_salary_complement_pt_action" model="ir.actions.act_window">
+        <field name="name">Salary Complement (PT)</field>
+        <field name="res_model">hr.salary.complement.pt</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="hr_salary_complement_pt_view_tree" />
+        <field name="search_view_id" ref="hr_salary_complement_pt_view_search" />
+    </record>
+
+    <menuitem
+        id="menu_hr_salary_complement_pt_action"
+        action="hr_salary_complement_pt_action"
+        sequence="25"
+        parent="payroll.payroll_menu_root"
+    />
+
+</odoo>

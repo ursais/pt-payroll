@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="employee_send_email_button_view_pt" model="ir.ui.view">
+            <field name="name">employee.send.email.button.view</field>
+            <field name="model">hr.payslip</field>
+            <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form" />
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <field name="salary_complement_count" invisible="1" />
+                    <field name="l10n_pt_same_reference_month_count" invisible="1" />
+                    <button
+                        type="object"
+                        class="oe_stat_button"
+                        name="action_open_salary_complements"
+                        id="open_salary_complements"
+                        icon="fa-files-o"
+                        attrs="{'invisible': ['|', ('country_code' ,'!=', 'PT'), ('salary_complement_count', '=', 0)]}"
+                    >
+                        <field
+                            name="salary_complement_count"
+                            widget="statinfo"
+                            string="Salary Complements"
+                            attrs="{'invisible': [('country_code' ,'!=', 'PT')]}"
+                        />
+                    </button>
+                    <button
+                        type="object"
+                        class="oe_stat_button"
+                        name="action_slips_from_the_same_reference_month"
+                        id="open_slips_from_the_same_reference_month"
+                        icon="fa-files-o"
+                        attrs="{'invisible': ['|', ('country_code' ,'!=', 'PT'), ('l10n_pt_same_reference_month_count', 'in', [0, 1])]}"
+                    >
+                        <field
+                            name="l10n_pt_same_reference_month_count"
+                            widget="statinfo"
+                            string="Reference Period Slips"
+                        />
+                    </button>
+                </div>
+                <label for="date_from" position="before">
+                    <field name="country_code" invisible="1" />
+                    <field name="l10n_pt_different_months" invisible="1" />
+                    <field
+                        name="l10n_pt_payslip_type"
+                        attrs="{'readonly': [('l10n_pt_payslip_type' ,'!=', 'normal')],
+                        'invisible': ['|', ('country_code' ,'!=', 'PT'), ('l10n_pt_payslip_type', '=', 'normal')]}"
+                    />
+                    <field
+                        name="l10n_pt_reference_period"
+                        attrs="{'invisible': ['|', ('country_code' ,'!=', 'PT'), ('l10n_pt_different_months' ,'=', False)]}"
+                    />
+                </label>
+                <field name="struct_id" position="after">
+                    <field name="l10n_pt_previous_payslip_id" attrs="{'invisible': [('l10n_pt_previous_payslip_id' ,'=', False)]}"/>
+                    <field name="l10n_pt_after_payslip_id" attrs="{'invisible': [('l10n_pt_after_payslip_id' ,'=', False)]}"/>
+                </field>
+                <xpath
+                    expr="//field[@name='line_ids']/tree/field[@name='total']"
+                    position="after"
+                >
+                    <field
+                        name="l10n_pt_amount_subject_to_ss"
+                        readonly="1"
+                        force_save="1"
+                        optional="hide"
+                    />
+                    <field
+                        name="l10n_pt_amount_subject_to_it"
+                        readonly="1"
+                        force_save="1"
+                        optional="hide"
+                    />
+                    <field
+                        name="l10n_pt_amount_exempt_to_it"
+                        readonly="1"
+                        force_save="1"
+                        optional="hide"
+                    />
+                </xpath>
+                <xpath
+                    expr="//field[@name='input_line_ids']/tree/field[@name='sequence']"
+                    position="after"
+                >
+                    <field name="salary_complement_pt_id" invisible="1" />
+                </xpath>
+                <xpath
+                    expr="//field[@name='worked_days_line_ids']/tree/field[@name='amount']"
+                    position="after"
+                >
+                    <field name="l10n_pt_missing_days_for_dri_curr_period" optional="hide" />
+                    <field name="l10n_pt_leave_amount_curr_period" optional="hide" />
+                    <field name="l10n_pt_missing_days_for_dri_prev_period" optional="hide" />
+                    <field name="l10n_pt_leave_amount_prev_period" optional="hide" />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="hr_payslip_run_view_form_pt" model="ir.ui.view">
+            <field name="name">hr.payslip.run.inherit.form.pt</field>
+            <field name="model">hr.payslip.run</field>
+            <field name="inherit_id" ref="hr_payroll.hr_payslip_run_form" />
+            <field name="arch" type="xml">
+                <field name="credit_note" position="before">
+                    <field name="country_code" invisible="1" />
+                    <field name="l10n_pt_different_months" invisible="1" />
+                    <field
+                        name="l10n_pt_reference_period"
+                        attrs="{'invisible': ['|', ('country_code' ,'!=', 'PT'), ('l10n_pt_different_months' ,'=', False)]}"
+                    />
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

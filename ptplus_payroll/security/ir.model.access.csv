@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_income_tax_pt_user,access.hr.income.tax.pt,model_hr_income_tax_pt,base.group_user,1,0,0,0
+access_hr_insurance_company_pt_user,access.hr.insurance.company.pt,model_hr_insurance_company_pt,base.group_user,1,0,0,0
+access_hr_profession_pt_user,access.hr.profession.pt,model_hr_profession_pt,base.group_user,1,0,0,0
+access_hr_qualification_pt_user,access.hr.qualification.pt,model_hr_qualification_pt,base.group_user,1,0,0,0
+access_hr_social_security_tax_pt_user,access.hr.social.security.tax.pt,model_hr_social_security_tax_pt,base.group_user,1,0,0,0
+access_hr_tax_office_pt_user,access.hr.tax.office.pt,model_hr_tax_office_pt,base.group_user,1,0,0,0
+access_hr_salary_rule_mixin_pt_user,access.hr.salary.rule.mixin.pt,model_hr_salary_rule_mixin_pt,base.group_user,1,0,0,0
+access_hr_payslip_mixin_pt_user,access.hr.payslip.mixin.pt,model_hr_payslip_mixin_pt,base.group_user,1,0,0,0
+access_payroll_statement_wizard_pt_user,access.payroll.statement.wizard.pt,model_payroll_statement_wizard_pt,base.group_user,1,1,1,1
+access_hr_professional_category_pt_user,access.hr.professional.category.pt,model_hr_professional_category_pt,base.group_user,1,0,0,0
+access_hr_professional_category_pt_hr_user,access.hr.professional.category.pt,model_hr_professional_category_pt,hr.group_hr_manager,1,1,1,1
+access_hr_marital_status_pt_user,access.hr.marital.status.pt,model_hr_marital_status_pt,base.group_user,1,0,0,0
+access_hr_payslip_employees_mixin_pt,access.hr.payslip_employees.mixin.pt,model_hr_payslip_employees_mixin_pt,base.group_user,1,0,0,0
+access_hr_special_fiscal_regime_pt_user,access.hr.special.fiscal.regime.pt,model_hr_special_fiscal_regime_pt,base.group_user,1,0,0,0
+access_hr_special_fiscal_regime_pt_manager,access.hr.special.fiscal.regime.pt,model_hr_special_fiscal_regime_pt,hr.group_hr_manager,1,1,1,1
