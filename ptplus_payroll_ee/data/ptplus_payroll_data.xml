@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- This file is duplicated in the EE and CE -->
+    <!-- Salary Rules Categories -->
+    <record id="ABONO" model="hr.salary.rule.category">
+        <field name="name">Abono</field>
+        <field name="code">ABONO</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="SAL_HORA" model="hr.salary.rule.category">
+        <field name="name">Salário Hora</field>
+        <field name="code">SAL_HORA</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="T_ABONOS" model="hr.salary.rule.category">
+        <field name="name">Total de Abonos</field>
+        <field name="code">T_ABONOS</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="DES" model="hr.salary.rule.category">
+        <field name="name">Desconto</field>
+        <field name="code">DES</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="T_DES" model="hr.salary.rule.category">
+        <field name="name">Total Descontos</field>
+        <field name="code">T_DES</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="SUBS_NAT_TRIBUTAVEL" model="hr.salary.rule.category">
+        <field name="name">Subsídio de Natal Tributável</field>
+        <field name="code">SUBS_NAT_TRIBUTAVEL</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="SUBS_FER_TRIBUTAVEL" model="hr.salary.rule.category">
+        <field name="name">Subsídio de Férias Tributável</field>
+        <field name="code">SUBS_FER_TRIBUTAVEL</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="BASE_INDE" model="hr.salary.rule.category">
+        <field name="name">Base Independente</field>
+        <field name="code">BASE_INDE</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="BASIC_TRIBUTAVEL" model="hr.salary.rule.category">
+        <field name="name">Vencimento Base Tributável</field>
+        <field name="code">BASIC_TRIBUTAVEL</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="IRS_TRIBUTADO" model="hr.salary.rule.category">
+        <field name="name">IRS Tributado</field>
+        <field name="code">IRS_TRIBUTADO</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="IRS_SOMA_BASE_TOTAL" model="hr.salary.rule.category">
+        <field name="name">IRS Soma Base Total</field>
+        <field name="code">IRS_SOMA_BASE_TOTAL</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="CONT_EMPRESA" model="hr.salary.rule.category">
+        <field name="name">Contribuição da Empresa</field>
+        <field name="code">CONT_EMPRESA</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="T_RECEBER" model="hr.salary.rule.category">
+        <field name="name">Total a Receber</field>
+        <field name="code">T_RECEBER</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="T_RECEBER_TIC" model="hr.salary.rule.category">
+        <field name="name">Total a Receber - Ticket</field>
+        <field name="code">T_RECEBER_TIC</field>
+        <field name="parent_id" eval="False" />
+    </record>
+
+    <record id="T_RECEBER_ESP" model="hr.salary.rule.category">
+        <field name="name">Total a Receber - Espécie</field>
+        <field name="code">T_RECEBER_ESP</field>
+        <field name="parent_id" eval="False" />
+    </record>
+ </odoo>

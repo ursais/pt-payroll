@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_expense_sheet_view_form_inherit" model="ir.ui.view">
+        <field name="name">hr.expense.sheet.view.form</field>
+        <field name="model">hr.expense.sheet</field>
+        <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="after">
+                <div class="alert alert-warning" role="alert" style="margin-bottom:0;" attrs="{'invisible':[('l10n_pt_error_message','=',False)]}">
+                <div class="o_row">
+                    <field name="l10n_pt_error_message"/>
+                </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

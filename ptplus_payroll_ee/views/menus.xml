@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <menuitem
+        id="ptplus_payroll_settings_menu"
+        name="Portugal"
+        parent="hr_work_entry_contract_enterprise.menu_hr_payroll_configuration"
+        sequence="999"
+        groups="hr_payroll.group_hr_payroll_user"
+    >
+    </menuitem>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_income_tax_pt_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_insurance_company_pt_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_profession_pt_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_qualification_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record
+        model="ir.ui.menu"
+        id="ptplus_payroll.menu_hr_social_security_tax_pt_action"
+    >
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_tax_office_pt_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_professional_category_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <menuitem
+        id="payroll_menu_report_pt"
+        name="Portugal"
+        parent="hr_payroll.menu_hr_payroll_report"
+        groups="hr_payroll.group_hr_payroll_user"
+    />
+
+</odoo>
