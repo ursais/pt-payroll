@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+<template id="line_name">
+    <t
+            t-set="description_on_payslip"
+            t-value="o.get_field_description_on_payslip(line)"
+        />
+    <t t-if="line.code == 'BASIC'">
+        <t t-if="description_on_payslip == ''">
+            <t t-if="o.employee_id.l10n_pt_intern == True">
+                <span>Internship Grant</span>
+            </t>
+            <t t-else="">
+                <span t-field="line.name" />
+            </t>
+        </t>
+        <t t-elif="description_on_payslip != ''">
+            <t t-if="o.employee_id.l10n_pt_intern == True">
+                <span>Internship Grant</span>
+            </t>
+            <t t-else="">
+                <span t-out="description_on_payslip" />
+            </t>
+        </t>
+    </t>
+    <t t-elif="line.code == 'IRS'">
+        <t t-if="description_on_payslip == ''">
+           <span t-field="line.name" />
+        </t>
+        <t t-elif="description_on_payslip != ''">
+            <span t-field="line.name" />
+        </t>
+        <t t-if="not o.get_date_of_apperance_eff_rate(o.date_to)">
+            <div style="font-size: 14px;">
+                <t t-set="irs_soma_base_line" t-value="o.line_ids.filtered(lambda line: line.code == 'IRS_SOMA_BASE')"/>
+                <t t-set="irs_soma_extra_line" t-value="o.line_ids.filtered(lambda line: line.code == 'IRS_HOR_EXTRA')"/>
+                <t t-if="o.only_basic_salary_in_slip(o.line_ids)">
+                    <span>Basic Salary: (Incidence:
+                        <span t-out="irs_soma_base_line.amount+irs_soma_extra_line.amount" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                        , TEMR:
+                        <span t-if="irs_soma_base_line.amount != 0"
+                              t-out="abs(int(irs_soma_base_line.total)/irs_soma_base_line.amount)"/>
+                        <span t-if="irs_soma_base_line.amount == 0">0</span> %)
+                    </span>
+                </t>
+                <t t-else="">
+                    <span>Basic Salary and Other Income: (Incidence:
+                        <span t-out="irs_soma_base_line.amount+irs_soma_extra_line.amount" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                        , TEMR:
+                        <span t-if="irs_soma_base_line.amount != 0"
+                              t-out="round(abs(int(irs_soma_base_line.total)/irs_soma_base_line.amount*100),2)"/>
+                        <span t-if="irs_soma_base_line.amount == 0">0</span> %)
+                    </span>
+                </t>
+                <t t-set="subs_fer_tributado_line" t-value="o.line_ids.filtered(lambda line: line.code == 'SUBS_FER_TRIBUTADO')"/>
+                <t t-if="subs_fer_tributado_line">
+                    <br />
+                    <span>Holiday Allowance: (Incidence:
+                        <span t-out="subs_fer_tributado_line.amount" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                        , TEMR: <span t-out="abs(subs_fer_tributado_line.rate)"/>%)
+                    </span>
+                </t>
+                <t t-set="subs_nat_tributado_line" t-value="o.line_ids.filtered(lambda line: line.code == 'SUBS_NAT_TRIBUTADO')"/>
+                <t t-if="subs_nat_tributado_line">
+                    <br />
+                    <span>Christmas Allowance: (Incidence:
+                        <span t-out="subs_nat_tributado_line.amount" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                        , TEMR: <span t-out="abs(subs_nat_tributado_line.rate)"/>%)
+                    </span>
+                </t>
+                <t t-set="irs_hor_extra_line" t-value="o.line_ids.filtered(lambda line: line.code == 'IRS_HOR_EXTRA')"/>
+                <t t-set="total_irs_soma_base_and_hora_extra" t-value="o.get_total_irs_soma_base_and_hora_extra(o)"/>
+                <t t-if="total_irs_soma_base_and_hora_extra">
+                    <br/>
+                    <span>IRS correction of previous receipts from the same reference period:
+                    <span t-out="line.total + total_irs_soma_base_and_hora_extra" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/> +
+                    <span t-out="abs(total_irs_soma_base_and_hora_extra)" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></span>
+                </t>
+            </div>
+        </t>
+    </t>
+
+    <t t-elif="line.code == 'SS'">
+        <t t-if="description_on_payslip == ''">
+            <span><span t-field="line.name" /> (<span
+                    t-field="o.employee_id.l10n_pt_employee_type_id.employee_tax_rate"
+                />%)</span>
+        </t>
+        <t t-elif="description_on_payslip != ''">
+            <span><span t-out="description_on_payslip" /> (<span
+                    t-field="o.employee_id.l10n_pt_employee_type_id.employee_tax_rate"
+                />%)</span>
+        </t>
+    </t>
+    <t t-else="">
+        <t t-if="description_on_payslip == ''">
+            <span t-field="line.name" />
+        </t>
+        <t t-else="description_on_payslip != ''">
+            <span t-out="description_on_payslip" />
+        </t>
+        <t t-set="weighted_average_note" t-value="o.get_note_for_the_weighted_average(line.code)"/>
+        <t t-if="weighted_average_note">
+             <div style="font-size: 14px;">
+                 <span t-out="weighted_average_note"></span>
+             </div>
+        </t>
+    </t>
+</template>
+
+<template id="report_slip_pt">
+    <t t-call="web.html_container">
+        <t t-foreach="inside_foreach_docs or docs" t-as="o">
+            <t t-call="web.external_layout">
+                <t
+                        t-set="o"
+                        t-value="o.with_context(lang=o.employee_id.address_home_id.lang or o.env.lang)"
+                    />
+                <div class="page">
+                    <h2 style="margin-bottom: 0.5cm">Payslip</h2>
+                    <t t-set="is_invalid" t-value="o._is_invalid()" />
+                    <t t-if="is_invalid">
+                        <strong id="invalid_warning"><t t-out="is_invalid" /></strong>
+                    </t>
+                    <div id="employee_info">
+                        <div style="width: 67%; float: left;">
+                            <div style="width: 30%; float: left">
+                                <strong>Employee</strong>
+                            </div>
+                            <div style="width: 70%; float:Right">
+                                <span t-esc="o.employee_id.l10n_pt_full_name or o.employee_id.name"/>
+                            </div>
+                            <div style="clear: both;" />
+                            <div style="width: 30%; float: left">
+                                <strong>Profession</strong>
+                            </div>
+                            <div style="width: 70%; float:Right">
+                                <span t-field="o.employee_id.l10n_pt_profession_id.name" />
+                            </div>
+                            <div style="clear: both;" />
+                            <div style="width: 30%; float: left">
+                                <strong>Professional Category</strong>
+                            </div>
+                            <div style="width: 70%; float:Right">
+                                <span
+                                        t-field="o.employee_id.l10n_pt_professional_category.name"
+                                    />
+                            </div>
+                            <div style="clear: both;" />
+                            <div style="width: 30%; float: left">
+                                <strong>No. Beneficiary</strong>
+                            </div>
+                            <div style="width: 70%; float:Right">
+                                <span t-field="o.employee_id.l10n_pt_niss" />
+                            </div>
+                            <div style="clear: both;" />
+                            <div style="width: 30%; float: left">
+                                <strong>No. Identification</strong>
+                            </div>
+                            <div style="width: 70%; float:Right">
+                                <t
+                                        t-if="o.employee_id.address_home_id.vat"
+                                        t-out="o.format_pt_vat(o.employee_id.address_home_id.vat)"
+                                    />
+                            </div>
+                            <div style="clear: both;" />
+                            <div style="width: 30%; float: left">
+                                <strong>Insurance</strong>
+                            </div>
+                            <div style="width: 70%; float:Right">
+                                <span>
+                                    <span
+                                            t-field="o.employee_id.l10n_pt_insurance_company_id"
+                                        /> insurance no
+                                    <span
+                                            t-field="o.employee_id.l10n_pt_insurance_policy_no"
+                                        />
+                                </span>
+                            </div>
+                            <div style="clear: both;" />
+                            <div style="width: 30%; float: left; margin-bottom: 0.8cm">
+                                <strong>Pay Period</strong>
+                            </div>
+                            <div style="width: 70%; float:Right">
+                                <span t-esc="o.get_slip_dates()[0]" />
+                                 -
+                                <span t-esc="o.get_slip_dates()[1]" />
+                            </div>
+                            <div style="clear: both;" />
+                        </div>
+                        <div style="width: 33%; float: right;">
+                            <div style="width: 70%; float: left">
+                                <strong>No. Employee</strong>
+                            </div>
+                            <div style="width: 30%; float:Right; text-align: right;">
+                                <span t-esc="o.pt_get_no_employee()" />
+                            </div>
+                            <div style="clear: both;" />
+                            <div style="width: 50%; float: left">
+                                <strong>Computed on </strong>
+                            </div>
+                            <div style="width: 50%; float:Right; text-align: right;">
+                                <span t-esc="o.get_slip_dates()[2]" />
+                            </div>
+                            <div style="clear: both;" />
+                            <div style="width: 55%; float: left;">
+                                <strong>Basic Salary</strong>
+                            </div>
+                            <div style="width: 45%; float:Right; text-align: right;">
+                                <span
+                                        t-out="o.contract_id._get_contract_wage()"
+                                        t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"
+                                    />
+                            </div>
+                            <div style="clear: both;" />
+                            <div style="width: 50%; float: left">
+                                <strong>Hourly wage</strong>
+                            </div>
+                            <div style="width: 50%; float:Right; text-align: right;">
+                                <span
+                                        t-out="o.line_ids.filtered(lambda line: line.code == 'SAL_HORA').total"
+                                        t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                    />
+                            </div>
+                            <div style="clear: both;" />
+                            <div style="width: 75%; float: left">
+                                <strong>Working Schedule</strong>
+                            </div>
+                            <div style="width: 25%; float:Right; text-align: right;">
+                                <span
+                                        t-field="o.contract_id.resource_calendar_id.hours_per_week"
+                                    />
+                            </div>
+                            <div style="clear: both;" />
+                        </div>
+                    </div>
+
+                    <div id="total" style="page-break-inside: auto !important;">
+                        <table class="table table-sm">
+                            <thead class="o_black_border">
+                                <tr style="text-align: left;">
+                                    <th>Name</th>
+                                    <th>Unit Value</th>
+                                    <th>Quantity</th>
+                                    <th style="text-align: right;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <span
+                                        t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)"
+                                        t-as="line"
+                                    >
+                                    <t t-set="line_style" />
+                                    <t t-set="line_class" />
+                                    <t t-if="line.code == 'NET'">
+                                        <t
+                                                t-set="line_style"
+                                                t-value="'color:#875A7B;'"
+                                            />
+                                        <t
+                                                t-set="line_class"
+                                                t-value="'o_total o_border_bottom fw-bold'"
+                                            />
+                                    </t>
+                                    <t
+                                            t-if="(line.code == 'BASIC') or (line.code == 'GROSS')"
+                                        >
+                                        <t
+                                                t-set="line_style"
+                                                t-value="'color:#00A09D;'"
+                                            />
+                                        <t
+                                                t-set="line_class"
+                                                t-value="'o_subtotal o_border_bottom'"
+                                            />
+                                    </t>
+                                    <tr
+                                            t-att-class="line_class"
+                                            t-att-style="line_style"
+                                            id="line_display"
+                                        >
+                                        <td>
+                                            <t t-call="ptplus_payroll.line_name" />
+                                        </td>
+                                        <td>
+                                            <t
+                                                    t-if="'FALTA' in line.code or 'FERIAS' in line.code"
+                                                >
+                                                <span />
+                                            </t>
+                                            <t t-else="">
+                                                <t t-if="line.quantity > 1">
+                                                    <t
+                                                            t-set="unit_value"
+                                                            t-value="line.total / line.quantity"
+                                                        />
+                                                    <span
+                                                            t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"
+                                                            t-out="unit_value"
+                                                        />
+                                                </t>
+
+                                                <t t-else="">
+                                                    <span />
+                                                </t>
+                                            </t>
+                                        </td>
+                                        <td>
+                                             <t
+                                                    t-if="'FALTA' in line.code or 'FERIAS' in line.code"
+                                                >
+                                                <t
+                                                        t-set="number_of_days"
+                                                        t-value="o.worked_days_line_ids.filtered(lambda wor_day_line: wor_day_line.code == line.code).number_of_days"
+                                                    />
+                                                <span t-out='number_of_days' />
+                                            </t>
+                                            <t t-else="">
+                                                <span
+                                                        t-if="line.quantity >= 1"
+                                                        t-out="line.quantity"
+                                                    />
+                                            </t>
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <t t-if="line.code == 'IRS'">
+                                                    <t
+                                                        t-set="irs_total"
+                                                        t-value="line.total"
+                                                    />
+                                                    <span
+                                                        t-esc="irs_total"
+                                                        t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                                        t-att-style="'color:#875A7B;' if line.total &lt; 0 else ''"
+                                                    />
+                                            </t>
+                                            <t t-elif="line.code == 'NET'">
+                                                <t
+                                                        t-set="total_net_amount"
+                                                        t-value="o.get_total_net_amount(o.line_ids)"
+                                                    />
+                                                <span
+                                                        t-esc="total_net_amount"
+                                                        t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                                        t-att-style="'color:#875A7B;' if line.total &lt; 0 else ''"
+                                                    />
+                                            </t>
+                                            <t t-else="">
+                                                <span
+                                                        t-out="line.total"
+                                                        t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                                        t-att-style="'color:#875A7B;' if line.total &lt; 0 else ''"
+                                                    />
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </span>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <t
+                            t-set="total_receivable_in_bank"
+                            t-value="o.line_ids.filtered(lambda line: line.code == 'NET').total"
+                        />
+                    <t t-if="total_receivable_in_bank">
+                        <span>The amount of <span
+                                    t-out='total_receivable_in_bank'
+                                    t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                /> was paid by bank transfer.</span>
+                    </t>
+                    <t
+                            t-set="total_in_kind"
+                            t-value="o.line_ids.filtered(lambda line: line.code == 'T_RECEBER_ESP').total"
+                        />
+                    <t t-if="total_in_kind">
+                        <span>
+                            The amount of <span
+                                    t-out="total_in_kind"
+                                    t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                /> was paid in kind.
+                        </span>
+                    </t>
+                    <t
+                            t-if="o.line_ids.filtered(lambda line: line.code == 'T_RECEBER_TIC')"
+                        >
+                        <t
+                                t-set="subs_ref_tic"
+                                t-value="o.line_ids.filtered(lambda line: line.code == 'T_RECEBER_TIC').total"
+                            />
+                        <span>The amount of <span
+                                    t-out="subs_ref_tic"
+                                    t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                /> was paid by meal Ticket/Card.
+                        </span>
+                    </t>
+
+                    <p t-if="total_receivable_in_bank &gt;= 0"><br />To pay on <b><span
+                                    t-field="o.employee_id.bank_account_id"
+                                /></b> of <i><span t-field="o.employee_id" /></i>:
+                        <span
+                                t-out='total_receivable_in_bank'
+                                t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                            />
+                    </p>
+                </div>
+            </t>
+        </t>
+    </t>
+</template>
+
+<template id="report_payslip_pt_lang">
+    <t t-foreach="docs" t-as="o">
+        <t t-set="inside_foreach_docs" t-value="o" />
+        <t
+                t-call="ptplus_payroll.report_slip_pt"
+                t-lang="o.employee_id.sudo().address_home_id.lang"
+            />
+    </t>
+</template>
+
+</odoo>
