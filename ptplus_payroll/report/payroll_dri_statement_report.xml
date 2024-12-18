@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="action_report_dri_stmt_pt" model="ir.actions.report">
+        <field name="name">DRI Statement</field>
+        <field name="model">payroll.statement.wizard.pt</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ptplus_payroll.report_dri_stmt_pt</field>
+        <field name="report_file">ptplus_payroll.report_dri_stmt_pt</field>
+        <field name="print_report_name">'DRI Statement'</field>
+        <field name="paperformat_id" ref="base.paperformat_batch_deposit" />
+        <field name="attachment" />
+        <field name="attachment_use" eval="False" />
+    </record>
+
+    <template id="report_dri_stmt_pt">
+        <t t-call="web.html_container">
+            <style>
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                table, th, td {
+                    border: 1px solid black;
+                }
+                th, td {
+                    padding: 8px;
+                    text-align: center;
+                }
+                th {
+                    background-color: #d3d3d3;
+                }
+                td {
+                    background-color: #f9f9f9;
+                }
+                h3, span {
+                    display: inline;
+                }
+                span {
+                    margin-left: 10px;
+                }
+            </style>
+
+<!--            Establishment Information -->
+            <h1>Payslip Data</h1>
+            <t t-foreach="content.items()" t-as="establishment">
+                <hr
+                    style="border: none; border-top: 2px solid #000; width: 100%; margin: 20px 0;"
+                />
+                <h3>Company Name:</h3>
+                <span t-out="establishment[0][0]" />
+                <br />
+                <h3>NISS:</h3>
+                <span t-out="establishment[0][1]" />
+                <br />
+                <h3>NIF:</h3>
+                <span t-out="establishment[0][2]" />
+                <br />
+                <h3>Period of Reference:</h3>
+                <span t-out="establishment[0][3][:4] + '/' + establishment[0][3][4:]" />
+                <br />
+                <h3>Tax:</h3>
+                <span t-out="establishment[1][-1:][0][0]" /> %
+                <hr
+                    style="border: none; border-top: 2px solid #000; width: 100%; margin: 20px 0;"
+                />
+
+
+<!--                Establishment table/Payment lines -->
+                <table style="border: 1px solid black;">
+                    <tr>
+                        <th>NISS P. Singular</th>
+                        <th>Name</th>
+                        <th>Birth Date</th>
+                        <th>Reference Month</th>
+                        <th>Number of days</th>
+                        <th>Payment Code</th>
+                        <th>Amount</th>
+                    </tr>
+
+                    <t t-foreach="establishment[1][:-1]" t-as="pay_line">
+                        <tr>
+                            <td t-out="pay_line[0]" />
+                            <td t-out="pay_line[1]" />
+                            <td
+                                t-out="pay_line[2][:4] + '/' + pay_line[2][4:6] + '/' + pay_line[2][6:]"
+                            />
+                            <td t-out="pay_line[3][:4] + '/' + pay_line[3][4:]" />
+                            <td t-out="pay_line[4]" />
+                            <td t-out="pay_line[5]" />
+                            <td t-out="pay_line[6]" />
+                        </tr>
+                    </t>
+
+                    <tr>
+                        <th colspan="3" style="text-align: left;">Total Contributions:
+                            <span
+                                style="float: right;"
+                                t-out="establishment[1][-1:][0][2]"
+                            />
+                        </th>
+                        <th colspan="4" style="text-align: left;">Total Salaries:
+                            <span
+                                style="float: right;"
+                                t-out="establishment[1][-1:][0][1]"
+                            />
+                        </th>
+                    </tr>
+
+                </table>
+            </t>
+        </t>
+    </template>
+
+
+</odoo>
