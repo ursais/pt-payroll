@@ -1,0 +1,4112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- This file is duplicated in the EE and CE -->
+    <!-- Salary Structure -->
+    <!-- TODO: This code is causing an error in pre-commit.
+    This file is temporary in the pre-commit configuration. -->
+    <record id="structure_type_employee_pt" model="hr.payroll.structure.type">
+        <field name="name">Empregado Português</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="default_work_entry_type_id"
+            ref="ptplus_payroll_ee.entry_type_pt_attendance"
+        />
+    </record>
+
+    <record id="hr_payroll_structure_pt_monthly_pay" model="hr.payroll.structure">
+        <field name="name">PT: Pagamento Mensal</field>
+        <field name="country_id" ref="base.pt" />
+        <field name="payslip_name">Recibo de Vencimento</field>
+        <field name="type_id" ref="structure_type_employee_pt" />
+        <field name="report_id" ref="ptplus_payroll.action_report_payslip_pt" />
+        <field
+            name="unpaid_work_entry_type_ids"
+            eval="[
+                (4, ref('ptplus_payroll_ee.entry_type_pt_lack_of_candidates_for_elections_and_polling_stations')),
+                (4, ref('ptplus_payroll_ee.entry_type_pt_absence_due_to_death_of_spouse_relative_or_related')),
+                (4, ref('ptplus_payroll_ee.entry_type_pt_lack_of_student_workers')),
+                (4, ref('ptplus_payroll_ee.entry_type_pt_public_holiday')),
+                (4, ref('ptplus_payroll_ee.entry_type_pt_marriage_license')),
+                (4, ref('ptplus_payroll_ee.entry_type_pt_absences_authorised_or_approved_by_the_employer')),
+        ]"
+        />
+    </record>
+
+<!-- This code is commented out due to a pre-commit error. It is necessary to manually define the default_struct_id -->
+<!--    <record id="structure_type_employee_pt" model="hr.payroll.structure.type">-->
+<!--        <field name="default_struct_id" ref="hr_payroll_structure_pt_monthly_pay" />-->
+<!--    </record>-->
+
+    <function model="hr.salary.rule" name="write">
+        <value
+            model="hr.salary.rule"
+            search="[
+            ('struct_id', '=', ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay')),
+            ('code', '=', 'BASIC')]"
+        />
+        <value
+            eval="{
+            'name': 'Vencimento Base',
+            'code': 'BASIC',
+            'sequence': 1,
+            'category_id': ref('ABONO'),
+            'condition_select': 'none',
+            'condition_python': 'result = True',
+            'amount_select': 'code',
+            'amount_python_compute': 'result = 0 if not contract.wage else contract.wage',
+            'l10n_pt_dri_subject_amount': 'P',
+            'l10n_pt_dmr_subject_amount': 'A',
+            'l10n_pt_dmr_exempt_amount': 'N/A',
+            'l10n_pt_standard_rule': True,
+            'l10n_pt_affects_income_tax': True,
+            'l10n_pt_affects_temr': True,
+            }"
+        />
+    </function>
+
+    <function model="hr.salary.rule" name="write">
+        <value
+            model="hr.salary.rule"
+            search="[
+            ('struct_id', '=', ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay')),
+            ('code', '=', 'GROSS')]"
+        />
+        <value
+            eval="{
+            'name': 'Total de Abonos',
+            'code': 'GROSS',
+            'sequence': 200,
+            'category_id': ref('T_ABONOS'),
+            'condition_select': 'none',
+            'condition_python': 'result = True',
+            'amount_select': 'code',
+            'amount_python_compute': '''result = categories['ABONO']''',
+            'l10n_pt_standard_rule': True,
+            }"
+        />
+    </function>
+
+    <function model="hr.salary.rule" name="write">
+        <value
+            model="hr.salary.rule"
+            search="[
+            ('struct_id', '=', ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay')),
+            ('code', '=', 'NET')]"
+        />
+        <value
+            eval="{
+            'name': 'Total a Receber',
+            'code': 'NET',
+            'sequence': 500,
+            'category_id': ref('T_RECEBER'),
+            'condition_select': 'none',
+            'condition_python': 'result = True',
+            'amount_select': 'code',
+            'amount_python_compute': '''result = get_net_amount(categories, result_rules)''',
+            'l10n_pt_standard_rule': True,
+            }"
+        />
+    </function>
+
+    <!-- Res Partner -->
+    <record id="hr_at" model="res.partner">
+        <field name="name">Autoridade Tributária e Aduaneira</field>
+    </record>
+    <record id="hr_ss" model="res.partner">
+        <field name="name">Segurança Social</field>
+    </record>
+    <record id="hr_ticket_restaurant" model="res.partner">
+        <field name="name">Ticket Restaurant</field>
+    </record>
+
+    <!-- Salary Rules -->
+    <!-- Abonos -->
+    <record id="rule_pt_meal_allowance_cash" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Refeição Pago em Numerário</field>
+        <field name="code">SUBS_REF_NUM</field>
+        <field name="sequence" eval="2" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+is_cash = contract.l10n_pt_meal_allowance_payment_method == "cash"
+has_amount = contract.l10n_pt_meal_allowance_amount
+
+result = is_cash and has_amount and (
+    'SUBS_REF_D' in inputs or contract.l10n_pt_automatically_processed_meal_allowance
+)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+auto_processed = contract.l10n_pt_automatically_processed_meal_allowance
+
+if auto_processed:
+    days = get_days_for_daily_meal(payslip)
+    result_qty = days
+elif 'SUBS_REF_D' in inputs:
+    result_qty = inputs['SUBS_REF_D'].amount
+else:
+    result_qty = 0
+result = contract.l10n_pt_meal_allowance_amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">R</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A21</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_meal_allowance_ticket" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Refeição Pago em Ticket</field>
+        <field name="code">SUBS_REF_TIC</field>
+        <field name="sequence" eval="3" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+is_ticket = contract.l10n_pt_meal_allowance_payment_method == "ticket"
+has_amount = contract.l10n_pt_meal_allowance_amount
+
+result = is_ticket and has_amount and (
+    'SUBS_REF_D' in inputs or contract.l10n_pt_automatically_processed_meal_allowance
+)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+auto_processed = contract.l10n_pt_automatically_processed_meal_allowance
+
+if auto_processed:
+    days = get_days_for_daily_meal(payslip)
+    result_qty = days
+elif 'SUBS_REF_D' in inputs:
+    result_qty = inputs['SUBS_REF_D'].amount
+else:
+    result_qty = 0
+result = contract.l10n_pt_meal_allowance_amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">R</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A21</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_meal_allowance_in_kind" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Refeição Pago em Espécie</field>
+        <field name="code">SUBS_REF_ESP</field>
+        <field name="sequence" eval="4" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+is_kind = contract.l10n_pt_meal_allowance_payment_method == "kind"
+has_amount = contract.l10n_pt_meal_allowance_amount
+
+result = is_kind and has_amount and (
+    'SUBS_REF_D' in inputs or contract.l10n_pt_automatically_processed_meal_allowance
+)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+auto_processed = contract.l10n_pt_automatically_processed_meal_allowance
+
+if auto_processed:
+    days = get_days_for_daily_meal(payslip)
+    result_qty = days
+elif 'SUBS_REF_D' in inputs:
+    result_qty = inputs['SUBS_REF_D'].amount
+else:
+    result_qty = 0
+result = contract.l10n_pt_meal_allowance_amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A21</field>
+        <field name="l10n_pt_paid_in_kind">True</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_failures_allowance" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Abono para Falhas de Caixa</field>
+        <field name="code">ABONO_FALHAS_CAIXA</field>
+        <field name="sequence" eval="5" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = contract.l10n_pt_failures_allowance</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = contract.l10n_pt_failures_allowance</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">M</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A23</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_kms_in_own_car" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Deslocação em viatura própria - Km's</field>
+        <field name="code">DES_VPROP</field>
+        <field name="sequence" eval="6" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+if payslip.expense_sheet_ids:
+    result = "DES_VPROP" in inputs or get_expense_sheets_values(payslip.expense_sheet_ids, "DES_VPROP")["expense_lines"]
+else:
+    result = 'DES_VPROP' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+qty = 0
+if payslip.expense_sheet_ids:
+    expense_values = get_expense_sheets_values(payslip.expense_sheet_ids, "DES_VPROP")
+    qty += expense_values["qty"]
+    price_unit = expense_values["price_unit"]
+if "DES_VPROP" in inputs:
+    qty += inputs['DES_VPROP'].amount
+    price_unit = contract.l10n_pt_value_per_km_in_own_vehicle
+
+result_qty = qty
+result = price_unit</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A22</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_kms_in_public_transport" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Deslocação em Transporte Público - Km's</field>
+        <field name="code">DES_TPUB</field>
+        <field name="sequence" eval="7" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'DES_TPUB' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_qty = inputs['DES_TPUB'].amount
+result = contract.l10n_pt_value_per_km_in_public_transport</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A22</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_balance_sheet_gratuities" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Gratificações ao Balanço Sujeitas</field>
+        <field name="code">GRAT_AO_BAL</field>
+        <field name="sequence" eval="8" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'GRAT_AO_BAL' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['GRAT_AO_BAL'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_balance_sheet_gratuities_exempt" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Gratificações ao Balanço Isentas</field>
+        <field name="code">GRAT_AO_BAL_ISENTAS</field>
+        <field name="sequence" eval="8" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'GRAT_AO_BAL_ISENTAS' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['GRAT_AO_BAL_ISENTAS'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A82</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_night_allowance" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio Noturno</field>
+        <field name="code">SUBS_NOTURNO</field>
+        <field name="sequence" eval="10" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_NOTURNO' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['SUBS_NOTURNO'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">T</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_per_diems_national" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Ajuda de Custo Nacional [d]</field>
+        <field name="code">AJUD_CUSTO_NAC</field>
+        <field name="sequence" eval="11" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+if payslip.expense_sheet_ids:
+    result = "AJUD_CUSTO_NAC" in inputs or get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_NAC")["expense_lines"]
+else:
+    result = 'AJUD_CUSTO_NAC' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+qty = 0
+if payslip.expense_sheet_ids:
+    expense_values = get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_NAC")
+    qty += expense_values["qty"]
+    price_unit = expense_values["price_unit"]
+if "AJUD_CUSTO_NAC" in inputs:
+    qty += inputs['AJUD_CUSTO_NAC'].amount
+    price_unit = contract.l10n_pt_per_diem_national
+
+result_qty = qty
+result = price_unit</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A22</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_per_diems_national_75" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Ajuda de Custo Nacional [d] (75%)</field>
+        <field name="code">AJUD_CUSTO_NAC_75</field>
+        <field name="sequence" eval="11" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+if payslip.expense_sheet_ids:
+    result = "AJUD_CUSTO_NAC_75" in inputs or get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_NAC_75")["expense_lines"]
+else:
+    result = 'AJUD_CUSTO_NAC_75' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+qty = 0
+if payslip.expense_sheet_ids:
+    expense_values = get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_NAC_75")
+    qty += expense_values["qty"]
+    price_unit = expense_values["price_unit"]
+if "AJUD_CUSTO_NAC_75" in inputs:
+    qty += inputs['AJUD_CUSTO_NAC_75'].amount
+    price_unit = contract.l10n_pt_per_diem_national * 0.75
+result_qty = qty
+result = price_unit</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A22</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_per_diems_national_50" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Ajuda de Custo Nacional [d] (50%)</field>
+        <field name="code">AJUD_CUSTO_NAC_50</field>
+        <field name="sequence" eval="11" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+if payslip.expense_sheet_ids:
+    result = "AJUD_CUSTO_NAC_50" in inputs or get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_NAC_50")["expense_lines"]
+else:
+    result = 'AJUD_CUSTO_NAC_50' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+qty = 0
+if payslip.expense_sheet_ids:
+    expense_values = get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_NAC_50")
+    qty += expense_values["qty"]
+    price_unit = expense_values["price_unit"]
+if "AJUD_CUSTO_NAC_50" in inputs:
+    qty += inputs['AJUD_CUSTO_NAC_50'].amount
+    price_unit = contract.l10n_pt_per_diem_national * 0.50
+result_qty = qty
+result = price_unit</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A22</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_per_diems_national_25" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Ajuda de Custo Nacional [d] (25%)</field>
+        <field name="code">AJUD_CUSTO_NAC_25</field>
+        <field name="sequence" eval="11" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+if payslip.expense_sheet_ids:
+    result = "AJUD_CUSTO_NAC_25" in inputs or get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_NAC_25")["expense_lines"]
+else:
+    result = 'AJUD_CUSTO_NAC_25' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+qty = 0
+if payslip.expense_sheet_ids:
+    expense_values = get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_NAC_25")
+    qty += expense_values["qty"]
+    price_unit = expense_values["price_unit"]
+if "AJUD_CUSTO_NAC_25" in inputs:
+    qty += inputs['AJUD_CUSTO_NAC_25'].amount
+    price_unit = contract.l10n_pt_per_diem_national * 0.25
+result_qty = qty
+result = price_unit</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A22</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_per_diems_international" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Ajuda de Custo Internacional [d]</field>
+        <field name="code">AJUD_CUSTO_INT</field>
+        <field name="sequence" eval="12" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+if payslip.expense_sheet_ids:
+    result = "AJUD_CUSTO_INT" in inputs or get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_INT")["expense_lines"]
+else:
+    result = 'AJUD_CUSTO_INT' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+qty = 0
+if payslip.expense_sheet_ids:
+    expense_values = get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_INT")
+    qty += expense_values["qty"]
+    price_unit = expense_values["price_unit"]
+if "AJUD_CUSTO_INT" in inputs:
+    qty += inputs['AJUD_CUSTO_INT'].amount
+    price_unit = contract.l10n_pt_per_diem_international
+result_qty = qty
+result = price_unit</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A22</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_per_diems_international_75" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Ajuda de Custo Internacional [d] (75%)</field>
+        <field name="code">AJUD_CUSTO_INT_75</field>
+        <field name="sequence" eval="12" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+if payslip.expense_sheet_ids:
+    result = "AJUD_CUSTO_INT_75" in inputs or get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_INT_75")["expense_lines"]
+else:
+    result = 'AJUD_CUSTO_INT_75' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+qty = 0
+if payslip.expense_sheet_ids:
+    expense_values = get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_INT_75")
+    qty += expense_values["qty"]
+    price_unit = expense_values["price_unit"]
+if "AJUD_CUSTO_INT_75" in inputs:
+    qty += inputs['AJUD_CUSTO_INT_75'].amount
+    price_unit = contract.l10n_pt_per_diem_international * 0.75
+result_qty = qty
+result = price_unit
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A22</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_per_diems_international_50" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Ajuda de Custo Internacional [d] (50%)</field>
+        <field name="code">AJUD_CUSTO_INT_50</field>
+        <field name="sequence" eval="12" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+if payslip.expense_sheet_ids:
+    result = "AJUD_CUSTO_INT_50" in inputs or get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_INT_50")["expense_lines"]
+else:
+    result = 'AJUD_CUSTO_INT_50' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+qty = 0
+if payslip.expense_sheet_ids:
+    expense_values = get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_INT_50")
+    qty += expense_values["qty"]
+    price_unit = expense_values["price_unit"]
+if "AJUD_CUSTO_INT_50" in inputs:
+    qty += inputs['AJUD_CUSTO_INT_50'].amount
+    price_unit = contract.l10n_pt_per_diem_international * 0.50
+result_qty = qty
+result = price_unit</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A22</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_per_diems_international_25" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Ajuda de Custo Internacional [d] (25%)</field>
+        <field name="code">AJUD_CUSTO_INT_25</field>
+        <field name="sequence" eval="12" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+if payslip.expense_sheet_ids:
+    result = "AJUD_CUSTO_INT_25" in inputs or get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_INT_25")["expense_lines"]
+else:
+    result = 'AJUD_CUSTO_INT_25' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+qty = 0
+if payslip.expense_sheet_ids:
+    expense_values = get_expense_sheets_values(payslip.expense_sheet_ids, "AJUD_CUSTO_INT_25")
+    qty += expense_values["qty"]
+    price_unit = expense_values["price_unit"]
+if "AJUD_CUSTO_INT_25" in inputs:
+    qty += inputs['AJUD_CUSTO_INT_25'].amount
+    price_unit = contract.l10n_pt_per_diem_international * 0.25
+result_qty = qty
+result = price_unit</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A22</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_diuturnidades" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Diuturnidades</field>
+        <field name="code">DIUTURNIDADES</field>
+        <field name="sequence" eval="13" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = contract.l10n_pt_diuturnities</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = contract.l10n_pt_diuturnities</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">B</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_work_schedule_exemption" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Isenção Horário de Trabalho</field>
+        <field name="code">ISENCAO_HOR_TRAB</field>
+        <field name="sequence" eval="14" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'ISENCAO_HOR_TRAB' in inputs or contract.l10n_pt_work_schedule_exemption_option == "value" or contract.l10n_pt_work_schedule_exemption_value and contract.l10n_pt_work_schedule_exemption_option == "rate" or contract.l10n_pt_work_schedule_exemption_rate and 'BASIC' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if  'ISENCAO_HOR_TRAB' in inputs:
+    result = inputs['ISENCAO_HOR_TRAB'].amount
+elif contract.l10n_pt_work_schedule_exemption_option == "value":
+    result = contract.l10n_pt_work_schedule_exemption_value
+else:
+    result = contract.l10n_pt_work_schedule_exemption_rate * contract.wage
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">M</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_remote_work_expense_electricity" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Despesas em Teletrabalho - Eletricidade</field>
+        <field name="code">DES_TEL_ELET</field>
+        <field name="sequence" eval="15" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'DES_TEL_ELET' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_qty = inputs['DES_TEL_ELET'].amount
+result = contract.l10n_pt_remote_work_expense_electricity</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">M</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A27</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_remote_work_expense_internet" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Despesas em Teletrabalho - Internet</field>
+        <field name="code">DES_TEL_INTE</field>
+        <field name="sequence" eval="16" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'DES_TEL_INTE' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_qty = inputs['DES_TEL_INTE'].amount
+result = contract.l10n_pt_remote_work_expense_internet</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">M</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A27</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_remote_work_expense_computer_equipment" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Despesas em Teletrabalho - Equipamento Informática</field>
+        <field name="code">DES_TEL_EQU_INF</field>
+        <field name="sequence" eval="17" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'DES_TEL_EQU_INF' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_qty = inputs['DES_TEL_EQU_INF'].amount
+result = contract.l10n_pt_remote_work_expense_computer_equipment</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">M</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A27</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_meal_allowance_not_taxed" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subs. Alimentação em valor (NAO TRIBUTADO)</field>
+        <field name="code">SUBS_REF_NAO_TRIB</field>
+        <field name="sequence" eval="18" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_REF_NAO_TRIB' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['SUBS_REF_NAO_TRIB'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A21</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_prem_bon_oth_sim_monthly_char" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Prémios, Bónus, outras análogas de caráter mensal</field>
+        <field name="code">PREM_MENSAL</field>
+        <field name="sequence" eval="48" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'PREM_MENSAL' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['PREM_MENSAL'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">B</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_prem_bon_oth_sim_of_non_monthly_char" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Prémios, Bónus, outras análogas de caráter não mensal</field>
+        <field name="code">PREM_N_MENSAL</field>
+        <field name="sequence" eval="48" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'PREM_N_MENSAL' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['PREM_N_MENSAL'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">O</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_commissions" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Comissões</field>
+        <field name="code">COM</field>
+        <field name="sequence" eval="49" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'COM' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['COM'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">C</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_transport_allowance" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Passes Sociais Transporte</field>
+        <field name="code">PAS_SOC_TRANS</field>
+        <field name="sequence" eval="50" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'PAS_SOC_TRANS' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['PAS_SOC_TRANS'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A23</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">False</field>
+        <field name="l10n_pt_affects_temr">False</field>
+        <field name="l10n_pt_paid_in_kind">True</field>
+    </record>
+
+    <record id="rule_pt_prevention_prize" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Prémio de Prevenção</field>
+        <field name="code">PREM_PREV</field>
+        <field name="sequence">51</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'PREM_PREV' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['PREM_PREV'].amount</field>
+        <field name="l10n_pt_dri_subject_amount">O</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_productivity_bonus" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Prémio de Produtividade</field>
+        <field name="code">PREM_PROD</field>
+        <field name="sequence">52</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'PREM_PROD' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['PREM_PROD'].amount</field>
+        <field name="l10n_pt_dri_subject_amount">O</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_personal_use_of_a_car" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field
+            name="name"
+        >Utilização Pessoal de Viatura Automóvel (com incidência de SS)</field>
+        <field name="code">UT_PES_VA</field>
+        <field name="sequence">53</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'UT_PES_VA' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['UT_PES_VA'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">A</field>
+        <field name="l10n_pt_dmr_subject_amount">A66</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">False</field>
+        <field name="l10n_pt_affects_temr">False</field>
+        <field name="l10n_pt_paid_in_kind">True</field>
+    </record>
+
+    <record id="rule_pt_personal_use_of_a_car_without_ss" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field
+            name="name"
+        >Utilização Pessoal de Viatura Automóvel (sem incidência de SS)</field>
+        <field name="code">UT_PES_VA_SEM_SS</field>
+        <field name="sequence">53</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = "UT_PES_VA_SEM_SS" in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs["UT_PES_VA_SEM_SS"]["amount]"</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">A66</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">False</field>
+        <field name="l10n_pt_affects_temr">False</field>
+        <field name="l10n_pt_paid_in_kind">True</field>
+    </record>
+
+    <record
+        id="rule_pt_trans_all_up_to_the_value_of_the_social_pass"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="ABONO" />
+        <field
+            name="name"
+        >Subsídio transporte até ao valor passe social Art.46 2.t) do CC</field>
+        <field name="code">SUB_TRANS_VAL_PAS_SOC</field>
+        <field name="sequence">54</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUB_TRANS_VAL_PAS_SOC' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['SUB_TRANS_VAL_PAS_SOC'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_income_in_kind_second_a_cirs" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Rendimentos em espécie (2º- A CIRS)</field>
+        <field name="code">REND_ESP_2CIRS</field>
+        <field name="sequence">55</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'REND_ESP_2CIRS' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['REND_ESP_2CIRS'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A23</field>
+        <field name="l10n_pt_paid_in_kind">True</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record
+        id="rule_pt_other_unspecified_income_in_kind_24_cirs"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="ABONO" />
+        <field
+            name="name"
+        >Outros rendimentos em espécie não especificados (24º CIRS)</field>
+        <field name="code">OUT_REN_ESP</field>
+        <field name="sequence">56</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'OUT_REN_ESP' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['OUT_REN_ESP'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_paid_in_kind">True</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_taxable_transportation_allowance" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio transporte tributável Art.46 2.t) do CC</field>
+        <field name="code">SUB_TRANS_TRIB</field>
+        <field name="sequence">57</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUB_TRANS_TRIB' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['SUB_TRANS_TRIB'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_education_ticket" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Ticket Educação</field>
+        <field name="code">TICKET_EDUC</field>
+        <field name="sequence">58</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'TICKET_EDUC' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['TICKET_EDUC'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_paid_in_kind">True</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_education_ticket_student_check" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Ticket Ensino/Cheque Estudante</field>
+        <field name="code">TIC_ENS_CHE_EST</field>
+        <field name="sequence">59</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'TIC_ENS_CHE_EST' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['TIC_ENS_CHE_EST'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_paid_in_kind">True</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_childcare_vouchers" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Ticket Infância/Cheque Creche</field>
+        <field name="code">TIC_INF_CHE_CRE</field>
+        <field name="sequence">60</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'TIC_INF_CHE_CRE' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['TIC_INF_CHE_CRE'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A23</field>
+        <field name="l10n_pt_paid_in_kind">True</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record
+        id="rule_pt_per_diem_without_daily_return_home_not_taxed"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="ABONO" />
+        <field
+            name="name"
+        >Ajudas de Custo sem Regresso Diário à Residência (NÃO TRIBUTADO)</field>
+        <field name="code">AC_S_REGR_DIA_RES</field>
+        <field name="sequence">61</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'AC_S_REGR_DIA_RES' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+weekly_working_hours = payslip.contract_id.resource_calendar_id.hours_per_week
+result = inputs['AC_S_REGR_DIA_RES'].amount * get_basic_hourly_wage(contract.wage, weekly_working_hours)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A22</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record
+        id="rule_pt_per_diem_with_daily_return_home_not_taxed"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="ABONO" />
+        <field
+            name="name"
+        >Ajudas de Custo com Regresso Diário à Residência (NÃO TRIBUTADO)</field>
+        <field name="code">AC_C_REGR_DIA_RES</field>
+        <field name="sequence">62</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'AC_C_REGR_DIA_RES' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+weekly_working_hours = payslip.contract_id.resource_calendar_id.hours_per_week
+result = inputs['AC_C_REGR_DIA_RES'].amount * get_basic_hourly_wage(contract.wage, weekly_working_hours)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A22</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_travel_allowance" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Deslocação</field>
+        <field name="code">SUBS_DESLO</field>
+        <field name="sequence">63</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_DESLO' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_qty = inputs['SUBS_DESLO'].amount
+result = contract.l10n_pt_travel_allowance</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_two_shift_regime" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Regime de 2 Turnos</field>
+        <field name="code">REG_2_TUR</field>
+        <field name="sequence">64</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = (contract.l10n_pt_shift_regime_option == "two_shift_regime" or 'REG_2_TUR' in inputs) and 'BASIC' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['REG_2_TUR']:
+    result = inputs['REG_2_TUR'].amount
+else:
+    result = contract.l10n_pt_shift_regime_rate * contract.wage </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">B</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_three_shift_regime" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Regime de 3 Turnos</field>
+        <field name="code">REG_3_TUR</field>
+        <field name="sequence">65</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = (contract.l10n_pt_shift_regime_option == "three_shift_regime" or 'REG_3_TUR' in inputs) and 'BASIC' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['REG_3_TUR']:
+    result = inputs['REG_3_TUR'].amount
+else:
+    result = contract.l10n_pt_shift_regime_rate * contract.wage </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">B</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_four_shift_regime" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Regime de 4 Turnos</field>
+        <field name="code">REG_4_TUR</field>
+        <field name="sequence">66</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = (contract.l10n_pt_shift_regime_option == "four_shift_regime" or 'REG_4_TUR' in inputs) and 'BASIC' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['REG_4_TUR']:
+    result = inputs['REG_4_TUR'].amount
+else:
+    result = contract.l10n_pt_shift_regime_rate * contract.wage </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">B</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_five_shift_regime" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Regime de 5 Turnos</field>
+        <field name="code">REG_5_TUR</field>
+        <field name="sequence">67</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = (contract.l10n_pt_shift_regime_option == "five_shift_regime" or 'REG_5_TUR' in inputs) and 'BASIC' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['REG_5_TUR']:
+    result = inputs['REG_5_TUR'].amount
+else:
+    result = contract.l10n_pt_shift_regime_rate * contract.wage </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">B</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_remuneration_or_backdating_adjustments" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Acertos de Remunerações ou Retroativos</field>
+        <field name="code">ACER_REM_RETROA</field>
+        <field name="sequence">68</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'ACER_REM_RETROA' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['ACER_REM_RETROA'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">6</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_unused_holidays" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Férias não Gozadas</field>
+        <field name="code">FER_NAO_GOZ</field>
+        <field name="sequence" eval="100" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FER_NAO_GOZ' in inputs or 'FER_NAO_GOZ_AMOUNT' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if 'FER_NAO_GOZ_AMOUNT' in inputs:
+    result = inputs['FER_NAO_GOZ_AMOUNT'].amount
+else:
+    result = get_total_affects_holiday_rules(result_rules_pt) / 22
+result_qty = inputs['FER_NAO_GOZ'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">2</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_overtime100" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra 1º Hora</field>
+        <field name="code">EXTRA100</field>
+        <field name="sequence">110</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA100' in inputs or ('EXTRA100' in worked_days and contract.l10n_pt_overtime_first_hour_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA100']:
+    result_qty = inputs['EXTRA100'].amount
+else:
+    result_qty = worked_days['EXTRA100'].amount
+result = pt_get_overtime(contract.l10n_pt_overtime_first_hour_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime200" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra Horas Seguintes</field>
+        <field name="code">EXTRA200</field>
+        <field name="sequence">111</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA200' in inputs or ('EXTRA200' in worked_days and contract.l10n_pt_overtime_remaining_hours_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA200']:
+    result_qty = inputs['EXTRA200'].amount
+else:
+    result_qty = worked_days["EXTRA200"].amount
+result = pt_get_overtime(contract.l10n_pt_overtime_remaining_hours_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime300" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra Dias de Descanso</field>
+        <field name="code">EXTRA300</field>
+        <field name="sequence">112</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA300' in inputs or ('EXTRA300' in worked_days and contract.l10n_pt_overtime_rest_days_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if 'EXTRA300' in inputs:
+    result_qty = inputs['EXTRA300'].amount
+else:
+    result_qty = worked_days["EXTRA300"].amount
+result = pt_get_overtime(contract.l10n_pt_overtime_rest_days_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime400" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra Dias Úteis</field>
+        <field name="code">EXTRA400</field>
+        <field name="sequence">113</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA400' in inputs or ('EXTRA400' in worked_days and contract.l10n_pt_overtime_workdays_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA400']:
+    result_qty = inputs['EXTRA400'].amount
+else:
+    result_qty = worked_days["EXTRA400"].amount
+result = pt_get_overtime(contract.l10n_pt_overtime_workdays_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime500" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra Feriados</field>
+        <field name="code">EXTRA500</field>
+        <field name="sequence">114</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA500' in inputs or ('EXTRA500' in worked_days and contract.l10n_pt_overtime_holidays_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA500']:
+    result_qty = inputs['EXTRA500'].amount
+else:
+    result_qty = worked_days["EXTRA500"].amount
+result = pt_get_overtime(contract.l10n_pt_overtime_holidays_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime600" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra Sábados e Feriados</field>
+        <field name="code">EXTRA600</field>
+        <field name="sequence">115</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA600' in inputs or ('EXTRA600' in worked_days and contract.l10n_pt_overtime_saturday_and_holidays_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA600']:
+    result_qty = inputs['EXTRA600'].amount
+else:
+    result_qty = worked_days["EXTRA600"].amount
+result = pt_get_overtime(contract.l10n_pt_overtime_saturday_and_holidays_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime700" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra Domingo</field>
+        <field name="code">EXTRA700</field>
+        <field name="sequence">116</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA700' in inputs or ('EXTRA700' in worked_days and contract.l10n_pt_overtime_sunday_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA700']:
+    result_qty = inputs['EXTRA700'].amount
+else:
+    result_qty = worked_days["EXTRA700"].amount
+result = pt_get_overtime(contract.l10n_pt_overtime_sunday_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime800" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra em período Noturno 1º Hora</field>
+        <field name="code">EXTRA800</field>
+        <field name="sequence">117</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA800' in inputs or ('EXTRA800' in worked_days and contract.l10n_pt_night_overtime_first_hour_rate and contract.l10n_pt_overtime_first_hour_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA800']:
+    result_qty = inputs['EXTRA800'].amount
+else:
+    result_qty = worked_days["EXTRA800"].number_of_hours
+result = pt_get_night_overtime(contract.l10n_pt_night_overtime_first_hour_rate, contract.l10n_pt_overtime_first_hour_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime900" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra em período Noturno Horas Seguintes</field>
+        <field name="code">EXTRA900</field>
+        <field name="sequence">118</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA900' in inputs or ('EXTRA900' in worked_days and contract.l10n_pt_night_overtime_remaining_hours_rate and contract.l10n_pt_overtime_remaining_hours_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA900']:
+    result_qty = inputs['EXTRA900'].amount
+else:
+    result_qty = worked_days["EXTRA900"].number_of_hours
+result = pt_get_night_overtime(contract.l10n_pt_night_overtime_remaining_hours_rate, contract.l10n_pt_overtime_remaining_hours_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime1000" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra em período Noturno Dias de Descanso</field>
+        <field name="code">EXTRA1000</field>
+        <field name="sequence">119</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA1000' in inputs or ('EXTRA1000' in worked_days and contract.l10n_pt_night_overtime_rest_days_rate and contract.l10n_pt_overtime_rest_days_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA1000']:
+    result_qty = inputs['EXTRA1000'].amount
+else:
+    result_qty = worked_days["EXTRA1000"].number_of_hours
+result = pt_get_night_overtime(contract.l10n_pt_night_overtime_rest_days_rate, contract.l10n_pt_overtime_rest_days_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime1100" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra em período Noturno Dias Úteis</field>
+        <field name="code">EXTRA1100</field>
+        <field name="sequence">120</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA1100' in inputs or ('EXTRA1100' in worked_days and contract.l10n_pt_night_overtime_workdays_rate and contract.l10n_pt_overtime_workdays_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA1100']:
+    result_qty = inputs['EXTRA1100'].amount
+else:
+    result_qty = worked_days["EXTRA1100"].number_of_hours
+result = pt_get_night_overtime(contract.l10n_pt_night_overtime_workdays_rate, contract.l10n_pt_overtime_workdays_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime1200" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra em período Noturno Feriados</field>
+        <field name="code">EXTRA1200</field>
+        <field name="sequence">121</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA1200' in inputs or ('EXTRA1200' in worked_days and contract.l10n_pt_night_overtime_holidays_rate and contract.l10n_pt_overtime_holidays_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA1200']:
+    result_qty = inputs['EXTRA1200'].amount
+else:
+    result_qty = worked_days["EXTRA1200"].number_of_hours
+result = pt_get_night_overtime(contract.l10n_pt_night_overtime_holidays_rate, contract.l10n_pt_overtime_holidays_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime1300" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra em período Noturno Sábado e Feriados</field>
+        <field name="code">EXTRA1300</field>
+        <field name="sequence">122</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA1300' in inputs or ('EXTRA1300' in worked_days and contract.l10n_pt_night_overtime_saturday_and_holidays_rate and contract.l10n_pt_overtime_saturday_and_holidays_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA1300']:
+    result_qty = inputs['EXTRA1300'].amount
+else:
+    result_qty = worked_days["EXTRA1300"].number_of_hours
+result = pt_get_night_overtime(contract.l10n_pt_night_overtime_holidays_rate, contract.l10n_pt_overtime_holidays_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime1400" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra em período Noturno Domingos</field>
+        <field name="code">EXTRA1400</field>
+        <field name="sequence">122</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA1400' in inputs or ('EXTRA1400' in worked_days and contract.l10n_pt_night_overtime_sunday_rate and contract.l10n_pt_overtime_sunday_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA1400']:
+    result_qty = inputs['EXTRA1400'].amount
+else:
+    result_qty = worked_days["EXTRA1400"].number_of_hours
+result = pt_get_night_overtime(contract.l10n_pt_night_overtime_sunday_rate, contract.l10n_pt_overtime_sunday_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime1500" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra 1º Hora a partir da 100º hora</field>
+        <field name="code">EXTRA1500</field>
+        <field name="sequence">124</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA1500' in inputs or ('EXTRA1500' in worked_days and contract.l10n_pt_overtime_first_hour_rate_100)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA1500']:
+    result_qty = inputs['EXTRA1500'].amount
+else:
+    result_qty = worked_days['EXTRA1500'].number_of_hours
+result = pt_get_overtime(contract.l10n_pt_overtime_first_hour_rate_100, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime1600" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra Horas Seguintes a partir da 100º hora</field>
+        <field name="code">EXTRA1600</field>
+        <field name="sequence">125</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA1600' in inputs or ('EXTRA1600' in worked_days and contract.l10n_pt_overtime_remaining_hours_rate_100)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA1600']:
+    result_qty = inputs['EXTRA1600'].amount
+else:
+    result_qty = worked_days['EXTRA1600'].number_of_hours
+result = pt_get_overtime(contract.l10n_pt_overtime_remaining_hours_rate_100, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime1700" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra Dias de Descanso a partir da 100º hora</field>
+        <field name="code">EXTRA1700</field>
+        <field name="sequence">126</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA1700' in inputs or ('EXTRA1700' in worked_days and contract.l10n_pt_overtime_rest_days_rate_100)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA1700']:
+    result_qty = inputs['EXTRA1700'].amount
+else:
+    result_qty = worked_days['EXTRA1700'].number_of_hours
+result = pt_get_overtime(contract.l10n_pt_overtime_rest_days_rate_100, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime1800" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra Dias Úteis a partir da 100º hora</field>
+        <field name="code">EXTRA1800</field>
+        <field name="sequence">127</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA1800' in inputs or ('EXTRA1800' in worked_days and contract.l10n_pt_overtime_workdays_rate_100)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA1800']:
+    result_qty = inputs['EXTRA1800'].amount
+else:
+    result_qty = worked_days['EXTRA1800'].number_of_hours
+result = pt_get_overtime(contract.l10n_pt_overtime_workdays_rate_100, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime1900" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra Feriados a partir da 100º hora</field>
+        <field name="code">EXTRA1900</field>
+        <field name="sequence">128</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA1900' in inputs or ('EXTRA1900' in worked_days and contract.l10n_pt_overtime_holidays_rate_100)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA1900']:
+    result_qty = inputs['EXTRA1900'].amount
+else:
+    result_qty = worked_days['EXTRA1900'].number_of_hours
+result = pt_get_overtime(contract.l10n_pt_overtime_holidays_rate_100, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime2000" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra Sábados e Feriados a partir da 100º hora</field>
+        <field name="code">EXTRA2000</field>
+        <field name="sequence">129</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA2000' in inputs or ('EXTRA2000' in worked_days and contract.l10n_pt_overtime_saturday_and_holidays_rate_100)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA2000']:
+    result_qty = inputs['EXTRA2000'].amount
+else:
+    result_qty = worked_days['EXTRA2000'].number_of_hours
+result = pt_get_overtime(contract.l10n_pt_overtime_saturday_and_holidays_rate_100, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_overtime2100" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Hora Extra Domingo a partir da 100º hora</field>
+        <field name="code">EXTRA2100</field>
+        <field name="sequence">130</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'EXTRA2100' in inputs or ('EXTRA2100' in worked_days and contract.l10n_pt_overtime_sunday_rate_100)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['EXTRA2100']:
+    result_qty = inputs['EXTRA2100'].amount
+else:
+    result_qty = worked_days['EXTRA2100'].number_of_hours
+result = pt_get_overtime(contract.l10n_pt_overtime_sunday_rate_100, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">S</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_night_work_rate" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Trabalho Noturno</field>
+        <field name="code">TRAB_NOT</field>
+        <field name="sequence">136</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'TRAB_NOT' in inputs or ('TRAB_NOT' in worked_days and contract.l10n_pt_night_work_rate)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if inputs['TRAB_NOT']:
+    result_qty = inputs['TRAB_NOT'].amount
+    result = pt_get_night_work(contract.l10n_pt_night_work_rate, result_rules_pt)
+else:
+    result_qty = worked_days["TRAB_NOT"].number_of_hours
+    result = pt_get_night_work(contract.l10n_pt_night_work_rate, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">T</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_severance_pay" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field
+            name="name"
+        >Indemnização por Cessação de Contrato sujeita a SS e IRS</field>
+        <field name="code">IND_CESS_CONT</field>
+        <field name="sequence">137</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'IND_CESS_CONT' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['IND_CESS_CONT'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record
+        id="rule_pt_severance_pay_not_subj_to_ss_and_subj_irs"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="ABONO" />
+        <field
+            name="name"
+        >Indemnização por Cessação de Contrato não sujeita a SS e Sujeita a IRS</field>
+        <field name="code">IND_CESS_CONT_NAO_SS_SUJ_IRS</field>
+        <field name="sequence">137</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'IND_CESS_CONT_NAO_SS_SUJ_IRS' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['IND_CESS_CONT_NAO_SS_SUJ_IRS'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A20</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record
+        id="rule_pt_severance_pay_not_subj_to_ss_and_not_to_irs"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="ABONO" />
+        <field
+            name="name"
+        >Indemnização por Cessação de Contrato não sujeita a SS nem a IRS</field>
+        <field name="code">IND_CESS_CONT_NAO_SS_NAO_IRS</field>
+        <field name="sequence">137</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'IND_CESS_CONT_NAO_SS_NAO_IRS' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['IND_CESS_CONT_NAO_SS_NAO_IRS'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A20</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="input_pt_holiday" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Feriado</field>
+        <field name="code">FERIADO</field>
+        <field name="sequence">138</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FERIADO' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FERIADO"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_holiday_allowance_previous_year" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Férias - Ano Anterior</field>
+        <field name="code">SUBS_FER_ANOS_ANT</field>
+        <field name="sequence" eval="139" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_FER_ANOS_ANT' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['SUBS_FER_ANOS_ANT'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">F</field>
+        <field name="l10n_pt_dmr_subject_amount">A3</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_holiday_allowance" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Férias</field>
+        <field name="code">SUBS_FER</field>
+        <field name="sequence" eval="140" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = (contract.l10n_pt_holiday_allowance_payment_method == "without_twelfths" and contract.l10n_pt_holiday_allowance_payment_month == payslip.date_to.strftime("%m")) or "SUBS_FER" in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if "SUBS_FER" in inputs:
+    result = inputs["SUBS_FER"].amount
+else:
+    result = pt_get_holiday_allowance(result_rules_pt, contract)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">F</field>
+        <field name="l10n_pt_dmr_subject_amount">A3</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_holiday_allowance_pro" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Férias - Proporcionais</field>
+        <field name="code">SUBS_FER_PROP</field>
+        <field name="sequence" eval="141" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_FER_PROP' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['SUBS_FER_PROP'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">F</field>
+        <field name="l10n_pt_dmr_subject_amount">A3</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_holiday_allowance_twelfths_to_100" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Férias (100% c/duodécimos)</field>
+        <field name="code">SUBS_FER_DUO</field>
+        <field name="sequence" eval="142" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = contract.l10n_pt_holiday_allowance_payment_method == "twelfths_to_100"</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = holiday_allowance_twelfths_to_100(result_rules_pt, contract)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">F</field>
+        <field name="l10n_pt_dmr_subject_amount">A3</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_holiday_allowance_twelfths_to_50" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Férias (50% c/duodécimos)</field>
+        <field name="code">SUBS_FER_DUO_50</field>
+        <field name="sequence" eval="143" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = contract.l10n_pt_holiday_allowance_payment_method == "twelfths_to_50" and contract.l10n_pt_holiday_allowance_payment_month</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = holiday_allowance_twelfths_to_50(result_rules_pt, contract)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">F</field>
+        <field name="l10n_pt_dmr_subject_amount">A3</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_holiday_allowance_50" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Férias a 50%</field>
+        <field name="code">SUBS_FER_50</field>
+        <field name="sequence" eval="144" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = contract.l10n_pt_holiday_allowance_payment_month == payslip.date_to.strftime("%m") and 'SUBS_FER_DUO_50' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = holiday_allowance_50(result_rules_pt, contract)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">F</field>
+        <field name="l10n_pt_dmr_subject_amount">A3</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_christmas_allowance" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Natal</field>
+        <field name="code">SUBS_NAT</field>
+        <field name="sequence" eval="145" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = (contract.l10n_pt_christmas_allowance_payment_method == "without_twelfths" and contract.l10n_pt_christmas_allowance_payment_month == payslip.date_to.strftime("%m")) or "SUBS_NAT" in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if "SUBS_NAT" in inputs:
+    result = inputs["SUBS_NAT"].amount
+else:
+    result = pt_get_christmas_allowance(result_rules_pt, contract)
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N</field>
+        <field name="l10n_pt_dmr_subject_amount">A4</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_christmas_allowance_pro" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Natal - Proporcionais</field>
+        <field name="code">SUBS_NATAL_PROP</field>
+        <field name="sequence" eval="146" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_NATAL_PROP' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['SUBS_NATAL_PROP'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N</field>
+        <field name="l10n_pt_dmr_subject_amount">A4</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_christmas_allowance_twelfths_to_100" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Natal (100% c/duodécimos)</field>
+        <field name="code">SUBS_NAT_DUO</field>
+        <field name="sequence" eval="147" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = contract.l10n_pt_christmas_allowance_payment_method == "twelfths_to_100"</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = christmas_allowance_twelfths_to_100(result_rules_pt, contract)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N</field>
+        <field name="l10n_pt_dmr_subject_amount">A4</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_christmas_allowance_twelfths_to_50" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Natal (50% c/duodécimos)</field>
+        <field name="code">SUBS_NAT_DUO_50</field>
+        <field name="sequence" eval="148" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = contract.l10n_pt_christmas_allowance_payment_method == "twelfths_to_50" and contract.l10n_pt_christmas_allowance_payment_month</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = christmas_allowance_twelfths_to_50(result_rules_pt, contract)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N</field>
+        <field name="l10n_pt_dmr_subject_amount">A4</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_christmas_allowance_50" model="hr.salary.rule">
+        <field name="category_id" ref="ABONO" />
+        <field name="name">Subsídio de Natal a 50%</field>
+        <field name="code">SUBS_NAT_50</field>
+        <field name="sequence" eval="149" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = contract.l10n_pt_christmas_allowance_payment_month == payslip.date_to.strftime("%m") and 'SUBS_NAT_DUO_50' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = christmas_allowance_50(result_rules_pt, contract)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N</field>
+        <field name="l10n_pt_dmr_subject_amount">A4</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_houly_wage" model="hr.salary.rule">
+        <field name="category_id" ref="SAL_HORA" />
+        <field name="name">Salário Hora</field>
+        <field name="code">SAL_HORA</field>
+        <field name="sequence" eval="150" />
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = pt_hourly_wage(result_rules_pt, contract)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <!-- Desconto -->
+    <record
+        id="rule_pt_unprofessional_missing_other_justified_absences"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta Outras Ausências Justificadas</field>
+        <field name="code">FALTA110</field>
+        <field name="sequence">201</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA110' in worked_days and 'BASIC' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA110"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record
+        id="rule_pt_absences_only_with_discounted_food_allowance"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta Apenas com Desconto Subs. Alimentação</field>
+        <field name="code">SUBS_ALIM120</field>
+        <field name="sequence">202</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_ALIM120' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_qty = worked_days["SUBS_ALIM120"].number_of_days if "SUBS_ALIM120" in worked_days else 0
+result = contract.l10n_pt_meal_allowance_amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">R</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A21</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_holiday_days" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Dias de Férias Gozadas (c/Desc. Subs. Alimentação)</field>
+        <field name="code">FERIAS130</field>
+        <field name="sequence">203</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FERIAS130' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_qty = worked_days["FERIAS130"].number_of_days if "FERIAS130" in worked_days else 0
+result = 0</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">R</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">A21</field>
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record
+        id="rule_pt_leave_type_pt_absence_due_to_accident_at_work"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta por Acidente de Trabalho</field>
+        <field name="code">FALTA140</field>
+        <field name="sequence">204</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA140' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA140"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record
+        id="rule_pt_absence_due_to_certified_occupational_illness"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta por Doença Profissional Certificada</field>
+        <field name="code">FALTA150</field>
+        <field name="sequence">205</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA150' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA150"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record
+        id="rule_pt_absence_due_to_uncertified_occupational_illness"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta por Doença Não Profissional Certificada</field>
+        <field name="code">FALTA160</field>
+        <field name="sequence">206</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA160' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA160"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_unprofessional_sick_leave" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta por Doença Não Profissional</field>
+        <field name="code">FALTA170</field>
+        <field name="sequence">207</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA170' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA170"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record
+        id="rule_pt_absence_for_undelayable_household_assistance"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta p/ Assistência Inadiável a Agregado Familiar</field>
+        <field name="code">FALTA180</field>
+        <field name="sequence">208</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA180' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA180"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_lack_of_student_worker" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta de Trabalhadores Estudantes</field>
+        <field name="code">FALTA190</field>
+        <field name="sequence">209</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA190' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA190"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record
+        id="rule_pt_absence_due_to_death_of_spouse_relative_or_related"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta por Falecimento do Cônjuge, Parente ou Afim</field>
+        <field name="code">FALTA200</field>
+        <field name="sequence">210</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA200' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA200"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_maternity_leave" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta por Maternidade</field>
+        <field name="code">FALTA210</field>
+        <field name="sequence">211</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA210' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA210"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_paternity_leave" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta por Paternidade</field>
+        <field name="code">FALTA220</field>
+        <field name="sequence">212</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA220' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA220"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record
+        id="rule_pt_lack_of_candidates_for_elections_and_polling_stations"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta Candidatos a Eleições e Mesas Voto</field>
+        <field name="code">FALTA230</field>
+        <field name="sequence">213</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA230' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA230"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_missing_by_strike" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta por Greve</field>
+        <field name="code">FALTA240</field>
+        <field name="sequence">214</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA240' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA240"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record
+        id="rule_pt_absence_to_exercise_member_functions_work_representation"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="DES" />
+        <field
+            name="name"
+        >Falta p/ Exercício Funções de Membros Representação de Trab.</field>
+        <field name="code">FALTA250</field>
+        <field name="sequence">215</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA250' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA250"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_missing_unjustified_absences" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Falta Ausências Injustificadas</field>
+        <field name="code">FALTA260</field>
+        <field name="sequence">216</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA260' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA260"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record
+        id="rule_pt_absences_authorised_or_approved_by_the_employer"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="DES" />
+        <field
+            name="name"
+        >Falta Ausências Autorizadas ou Aprovadas pelo Empregador</field>
+        <field name="code">FALTA270</field>
+        <field name="sequence">217</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA270' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA270"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_discount_days_per_contract_start" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Desconto Dias por Início/Fim de Contrato</field>
+        <field name="code">FALTA280</field>
+        <field name="sequence">218</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA280' in worked_days or 'FALTA280' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if 'FALTA280' in inputs:
+    result = inputs["FALTA280"].amount
+else:
+    result = worked_days["FALTA280"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_holiday" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Férias</field>
+        <field name="code">FERIAS300</field>
+        <field name="sequence">220</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FERIAS300' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_qty = worked_days["FERIAS300"].number_of_days if "FERIAS300" in worked_days else 0
+result = 0</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_subject_amount">N/A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_marriage_license" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Licença de Casamento</field>
+        <field name="code">FALTA310</field>
+        <field name="sequence">221</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'FALTA310' in worked_days</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = worked_days["FALTA310"].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_dri_subject_amount">P</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_discount_work_schedule_exemption" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Desconto Isenção Horário de Trabalho</field>
+        <field name="code">DES_ISENCAO_HOR_TRAB</field>
+        <field name="sequence">230</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'ISENCAO_HOR_TRAB' in rules and pt_get_proportional_allowance(rules["ISENCAO_HOR_TRAB"], pt_get_result_rules("ISENCAO_HOR_TRAB", result_rules))</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -pt_get_proportional_allowance(rules["ISENCAO_HOR_TRAB"], pt_get_result_rules("ISENCAO_HOR_TRAB", result_rules))
+</field>
+        <field name="l10n_pt_dri_subject_amount">M</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_discount_two_shift_regime" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Desconto Regime de 2 Turnos</field>
+        <field name="code">DES_REG_2_TUR</field>
+        <field name="sequence">231</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'REG_2_TUR' in rules and pt_get_proportional_allowance(rules["REG_2_TUR"], pt_get_result_rules("REG_2_TUR", result_rules))</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -pt_get_proportional_allowance(rules["REG_2_TUR"], pt_get_result_rules("REG_2_TUR", result_rules))
+</field>
+        <field name="l10n_pt_dri_subject_amount">B</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_discount_three_shift_regime" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Desconto Regime de 3 Turnos</field>
+        <field name="code">DES_REG_3_TUR</field>
+        <field name="sequence">232</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'REG_3_TUR' in rules and pt_get_proportional_allowance(rules["REG_3_TUR"], pt_get_result_rules("REG_3_TUR", result_rules))</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -pt_get_proportional_allowance(rules["REG_3_TUR"], pt_get_result_rules("REG_3_TUR", result_rules))
+</field>
+        <field name="l10n_pt_dri_subject_amount">B</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_discount_four_shift_regime" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Desconto Regime de 4 Turnos</field>
+        <field name="code">DES_REG_4_TUR</field>
+        <field name="sequence">232</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'REG_4_TUR' in rules and pt_get_proportional_allowance(rules["REG_4_TUR"], pt_get_result_rules("REG_4_TUR", result_rules))</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -pt_get_proportional_allowance(rules["REG_4_TUR"], pt_get_result_rules("REG_4_TUR", result_rules))
+</field>
+        <field name="l10n_pt_dri_subject_amount">B</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_discount_five_shift_regime" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Desconto Regime de 5 Turnos</field>
+        <field name="code">DES_REG_5_TUR</field>
+        <field name="sequence">232</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'REG_5_TUR' in rules and pt_get_proportional_allowance(rules["REG_5_TUR"], pt_get_result_rules("REG_5_TUR", result_rules))</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -pt_get_proportional_allowance(rules["REG_5_TUR"], pt_get_result_rules("REG_5_TUR", result_rules))
+</field>
+        <field name="l10n_pt_dri_subject_amount">B</field>
+        <field name="l10n_pt_dmr_subject_amount">A</field>
+        <field name="l10n_pt_dmr_exempt_amount">N/A</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="l10n_pt_affects_income_tax">True</field>
+        <field name="l10n_pt_affects_temr">True</field>
+    </record>
+
+    <record id="rule_pt_taxable_christ_allow_b_inden" model="hr.salary.rule">
+        <field name="category_id" ref="SUBS_NAT_TRIBUTAVEL" />
+        <field name="name">Subs. Natal Tributável (Base Independente)</field>
+        <field name="code">SUBS_NAT_TRIBUTAVEL</field>
+        <field name="sequence">250</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = (
+    ("SUBS_NAT" in rules or
+    "SUBS_NAT_DUO" in rules or
+    "SUBS_NAT_DUO_50" in rules or
+    "SUBS_NAT_50" in rules or
+    "SUBS_NATAL_PROP" in rules)
+)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result =  pt_get_christmas_allowance(result_rules_pt, contract) + result_rules["SUBS_NATAL_PROP"]["total"]</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_taxed_christ_allow_b_inden" model="hr.salary.rule">
+        <field name="category_id" ref="BASE_INDE" />
+        <field name="name">Subs. Natal Tributado (Base Independente)</field>
+        <field name="code">SUBS_NAT_TRIBUTADO</field>
+        <field name="sequence">251</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_NAT_TRIBUTAVEL' in rules and ("SUBS_NATAL_PROP" in rules or "SUBS_NAT" in rules)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_rate = employee.get_irs(result_rules["SUBS_NAT_TRIBUTAVEL"]["total"], payslip)
+total = result_rules["SUBS_NAT"]["total"] + result_rules["SUBS_NATAL_PROP"]["total"]
+if employee.pt_employee_has_youth_irs():
+    result = employee.pt_get_youth_irs_amount_subject_it(payslip, total)
+else:
+    if employee.l10n_pt_income_tax_region == "e":
+        RMNG = payslip.rule_parameter("salario_minimo_nacional")
+        result = max(total - RMNG, 0)
+    else:
+        result = total
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_taxed_christ_allow_twelfths_100_b_inden" model="hr.salary.rule">
+        <field name="category_id" ref="BASE_INDE" />
+        <field name="name">Subs. Natal 100% c/duo Tributado (Base Independente)</field>
+        <field name="code">SUBS_NAT_DUO_TRIBUTADO</field>
+        <field name="sequence">252</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_NAT_TRIBUTAVEL' in rules and 'SUBS_NAT_DUO' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+total_taxable_temr = result_rules["SUBS_NAT_TRIBUTAVEL"]["total"]
+result_rate = employee.get_irs(total_taxable_temr, payslip)
+if employee.pt_employee_has_youth_irs():
+    result = employee.pt_get_youth_irs_amount_subject_it(payslip, result_rules["SUBS_NAT_DUO"]["total"], christ_or_holidays=True, code="SUBS_NAT_DUO")
+else:
+    if employee.l10n_pt_income_tax_region == "e":
+        RMNG = payslip.rule_parameter("salario_minimo_nacional")
+        result = max(result_rules["SUBS_NAT_DUO"]["total"] - (RMNG/12), 0)
+    else:
+        result = result_rules["SUBS_NAT_DUO"]["total"]
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_taxed_christ_allow_twelfths_50_b_inden" model="hr.salary.rule">
+        <field name="category_id" ref="BASE_INDE" />
+        <field name="name">Subs. Natal 50% c/duo Tributado (Base Independente)</field>
+        <field name="code">SUBS_NAT_DUO_50_TRIBUTADO</field>
+        <field name="sequence">253</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_NAT_TRIBUTAVEL' in rules and 'SUBS_NAT_DUO_50' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+total_taxable_temr = result_rules["SUBS_NAT_TRIBUTAVEL"]["total"]
+result_rate = employee.get_irs(total_taxable_temr, payslip)
+if employee.pt_employee_has_youth_irs():
+    result = employee.pt_get_youth_irs_amount_subject_it(payslip, result_rules["SUBS_NAT_DUO_50"]["total"], christ_or_holidays=True, code="SUBS_NAT_DUO_50")
+else:
+    if employee.l10n_pt_income_tax_region == "e":
+        RMNG = payslip.rule_parameter("salario_minimo_nacional")
+        result = max(result_rules["SUBS_NAT_DUO_50"]["total"] - (RMNG/24), 0)
+    else:
+        result = result_rules["SUBS_NAT_DUO_50"]["total"]
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_taxed_christ_allow_50_b_inden" model="hr.salary.rule">
+        <field name="category_id" ref="BASE_INDE" />
+        <field name="name">Subs. Natal 50% Tributado (Base Independente)</field>
+        <field name="code">SUBS_NAT_50_TRIBUTADO</field>
+        <field name="sequence">254</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_NAT_TRIBUTAVEL' in rules and 'SUBS_NAT_50' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+total_taxable_temr = result_rules["SUBS_NAT_TRIBUTAVEL"]["total"]
+result_rate = employee.get_irs(total_taxable_temr, payslip)
+if employee.pt_employee_has_youth_irs():
+    result = employee.pt_get_youth_irs_amount_subject_it(payslip, result_rules["SUBS_NAT_50"]["total"], christ_or_holidays=True, code="SUBS_NAT_50")
+else:
+    if employee.l10n_pt_income_tax_region == "e":
+        RMNG = payslip.rule_parameter("salario_minimo_nacional")
+        result = max(result_rules["SUBS_NAT_50"]["total"] - (RMNG/2), 0)
+    else:
+        result = result_rules["SUBS_NAT_50"]["total"]
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_taxable_holidays_allow_b_inden" model="hr.salary.rule">
+        <field name="category_id" ref="SUBS_FER_TRIBUTAVEL" />
+        <field name="name">Subs. Férias Tributável (Base Independente)</field>
+        <field name="code">SUBS_FER_TRIBUTAVEL</field>
+        <field name="sequence">255</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = (
+    'SUBS_FER' in rules or
+    'SUBS_FER_DUO' in rules or
+    'SUBS_FER_DUO_50' in rules or
+    'SUBS_FER_50' in rules or
+    'SUBS_FER_PROP' in rules or
+    'SUBS_FER_ANOS_ANT' in rules
+)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = pt_get_holiday_allowance(result_rules_pt, contract) + result_rules["SUBS_FER_PROP"]["total"] + result_rules["SUBS_FER_ANOS_ANT"]["total"]</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_taxed_holidays_allow_b_inden" model="hr.salary.rule">
+        <field name="category_id" ref="BASE_INDE" />
+        <field name="name">Subs. Férias Tributado (Base Independente)</field>
+        <field name="code">SUBS_FER_TRIBUTADO</field>
+        <field name="sequence">256</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_FER_TRIBUTAVEL' in rules and ('SUBS_FER_PROP' in rules or 'SUBS_FER' in rules or "SUBS_FER_ANOS_ANT" in rules)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_rate = employee.get_irs(result_rules["SUBS_FER_TRIBUTAVEL"]["total"], payslip)
+total = result_rules["SUBS_FER"]["total"] + result_rules["SUBS_FER_PROP"]["total"] + result_rules["SUBS_FER_ANOS_ANT"]["total"]
+if employee.pt_employee_has_youth_irs():
+    result = employee.pt_get_youth_irs_amount_subject_it(payslip, total)
+else:
+    if employee.l10n_pt_income_tax_region == "e":
+        RMNG = payslip.rule_parameter("salario_minimo_nacional")
+        result = max(total - RMNG, 0)
+    else:
+        result = total
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record
+        id="rule_pt_taxed_holidays_allow_twelfths_100_b_inden"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="BASE_INDE" />
+        <field name="name">Subs. Férias 100% c/duo Tributado (Base Independente)</field>
+        <field name="code">SUBS_FER_DUO_TRIBUTADO</field>
+        <field name="sequence">257</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_FER_TRIBUTAVEL' in rules and 'SUBS_FER_DUO' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+total_taxable_temr = result_rules["SUBS_FER_TRIBUTAVEL"]["total"]
+result_rate = employee.get_irs(total_taxable_temr, payslip)
+if employee.pt_employee_has_youth_irs():
+    result = employee.pt_get_youth_irs_amount_subject_it(payslip, result_rules["SUBS_FER_DUO"]["total"], christ_or_holidays=True, code="SUBS_FER_DUO")
+else:
+    if employee.l10n_pt_income_tax_region == "e":
+        RMNG = payslip.rule_parameter("salario_minimo_nacional")
+        result = max(result_rules["SUBS_FER_DUO"]["total"] - (RMNG/12), 0)
+    else:
+        result = result_rules["SUBS_FER_DUO"]["total"]
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record
+        id="rule_pt_taxed_holidays_allow_twelfths_50_b_inden"
+        model="hr.salary.rule"
+    >
+        <field name="category_id" ref="BASE_INDE" />
+        <field name="name">Subs. Férias 50% c/duo Tributado (Base Independente)</field>
+        <field name="code">SUBS_FER_DUO_50_TRIBUTADO</field>
+        <field name="sequence">258</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_FER_TRIBUTAVEL' in rules and 'SUBS_FER_DUO_50' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+total_taxable_temr = result_rules["SUBS_FER_TRIBUTAVEL"]["total"]
+result_rate = employee.get_irs(total_taxable_temr, payslip)
+if employee.pt_employee_has_youth_irs():
+    result = employee.pt_get_youth_irs_amount_subject_it(payslip, result_rules["SUBS_FER_DUO_50"]["total"], christ_or_holidays=True, code="SUBS_FER_DUO_50")
+else:
+    if employee.l10n_pt_income_tax_region == "e":
+        RMNG = payslip.rule_parameter("salario_minimo_nacional")
+        result = max(result_rules["SUBS_FER_DUO_50"]["total"] - (RMNG/24), 0)
+    else:
+        result = result_rules["SUBS_FER_DUO_50"]["total"]
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_taxed_holidays_allow_50_b_inden" model="hr.salary.rule">
+        <field name="category_id" ref="BASE_INDE" />
+        <field name="name">Subs. Férias 50% Tributado (Base Independente)</field>
+        <field name="code">SUBS_FER_50_TRIBUTADO</field>
+        <field name="sequence">259</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_FER_TRIBUTAVEL' in rules and 'SUBS_FER_50' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+total_taxable_temr = result_rules["SUBS_FER_TRIBUTAVEL"]["total"]
+result_rate = employee.get_irs(total_taxable_temr, payslip)
+if employee.pt_employee_has_youth_irs():
+    result = employee.pt_get_youth_irs_amount_subject_it(payslip, result_rules["SUBS_FER_50"]["total"], christ_or_holidays=True, code="SUBS_FER_50")
+else:
+    if employee.l10n_pt_income_tax_region == "e":
+        RMNG = payslip.rule_parameter("salario_minimo_nacional")
+        result = max(result_rules["SUBS_FER_50"]["total"] - (RMNG/2), 0)
+    else:
+        result = result_rules["SUBS_FER_50"]["total"]
+    </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_tax_base_irs_base_independent" model="hr.salary.rule">
+        <field name="category_id" ref="IRS_TRIBUTADO" />
+        <field name="name">IRS (Base Independente)</field>
+        <field name="code">IRS_INDEP</field>
+        <field name="sequence">280</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'BASE_INDE' in categories</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -categories["BASE_INDE"]</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_deduction_health_insurance" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Dedução Seguro de Saúde</field>
+        <field name="code">DED_SEG_S</field>
+        <field name="sequence" eval="282" />
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'DED_SEG_S' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = - inputs['DED_SEG_S'].amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_tax_base_irs_adds_to_base_total" model="hr.salary.rule">
+        <field name="active">False</field>
+        <field name="category_id" ref="hr_payroll.DED" />
+        <field name="name">IRS (Soma à Base) Total</field>
+        <field name="code">IRS_SOMA_BASE_TOTAL</field>
+        <field name="sequence">379</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python" />
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute" />
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_tax_base_irs_adds_to_base" model="hr.salary.rule">
+        <field name="category_id" ref="IRS_TRIBUTADO" />
+        <field name="name">IRS (Soma à Base)</field>
+        <field name="code">IRS_SOMA_BASE</field>
+        <field name="sequence">380</field>
+        <field name="condition_select">none</field>
+        <field name="condition_python">result = True</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+income_overtime = 0
+if employee.pt_employee_has_youth_irs():
+    income_overtime = get_total_income_overtime(payslip, result_rules_pt)
+result_rate = - employee.get_irs(get_total_amount_affects_temr(payslip, result_rules_pt) + income_overtime, payslip)
+result = get_tax_sum_to_base(payslip, result_rules_pt)
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_irs_overtime" model="hr.salary.rule">
+        <field name="category_id" ref="IRS_TRIBUTADO" />
+        <field name="name">IRS (Horas Extra)</field>
+        <field name="code">IRS_HOR_EXTRA</field>
+        <field name="sequence">385</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'IRS_SOMA_BASE' in rules and get_total_income_overtime(payslip, result_rules_pt) and not employee.pt_employee_has_youth_irs()</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_rate = - employee.get_irs(get_total_amount_affects_temr(payslip, result_rules_pt), payslip) / 2
+result = get_total_income_overtime(payslip, result_rules_pt)
+</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_tax_base_irs" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">IRS</field>
+        <field name="code">IRS</field>
+        <field name="sequence">400</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'IRS_SOMA_BASE' in rules or 'IRS_INDEP' in rules or contract.wage == 0</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = compute_irs_amount(categories["IRS_TRIBUTADO"], payslip)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="partner_id" ref="hr_at" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_tax_base_ss" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Segurança Social</field>
+        <field name="code">SS</field>
+        <field name="sequence">440</field>
+        <field name="condition_select">none</field>
+        <field name="condition_python">
+result = True</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if employee.l10n_pt_corporate_body and not employee.l10n_pt_deducts_ss_from_another_company and contract.wage == 0:
+    result_rate = - employee.l10n_pt_employee_type_id.employee_tax_rate
+    payslip_date = payslip.date_to
+    result = rule_parameter("valor_de_ias", payslip_date)
+elif employee.l10n_pt_corporate_body and contract.employee_id.l10n_pt_deducts_ss_from_another_company and contract.wage == 0:
+    result = 0
+else:
+    result_rate = - employee.l10n_pt_employee_type_id.employee_tax_rate
+    result = get_amount_subject_to_ss(result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="partner_id" ref="hr_ss" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_tax_base_ss_employer" model="hr.salary.rule">
+        <field name="category_id" ref="CONT_EMPRESA" />
+        <field name="name">Segurança Social Entidade Patronal</field>
+        <field name="code">SS_EP</field>
+        <field name="sequence">441</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SS' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if employee.l10n_pt_corporate_body and not employee.l10n_pt_deducts_ss_from_another_company and contract.wage == 0:
+    result_rate = employee.l10n_pt_employee_type_id.company_tax_rate
+    payslip_date = payslip.date_to
+    result = rule_parameter("valor_de_ias", payslip_date)
+elif employee.l10n_pt_corporate_body and contract.employee_id.l10n_pt_deducts_ss_from_another_company and contract.wage == 0:
+    result = 0
+else:
+    result_rate = employee.l10n_pt_employee_type_id.company_tax_rate
+    result = get_amount_subject_to_ss(result_rules_pt, payslip)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="partner_id" ref="hr_ss" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_tax_base_ss_employer_espec" model="hr.salary.rule">
+        <field name="category_id" ref="CONT_EMPRESA" />
+        <field
+            name="name"
+        >Segurança Social Entidade Patronal (Utilização da Provisão)</field>
+        <field name="code">SS_EP_ESPEC</field>
+        <field name="sequence">443</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+codes_base_indep = any([
+    "SUBS_FER" in rules,
+    "SUBS_FER_DUO" in rules,
+    "SUBS_FER_DUO_50" in rules,
+    "SUBS_FER_50" in rules,
+    "SUBS_NAT" in rules,
+    "SUBS_NAT_DUO" in rules,
+    "SUBS_NAT_DUO_50" in rules,
+    "SUBS_NAT_50" in rules,
+    "SUBS_FER_PROP" in rules,
+    "SUBS_NATAL_PROP" in rules,
+])
+result = codes_base_indep and payslip.company_id.l10n_pt_enable_provisions</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_rate = employee.l10n_pt_employee_type_id.company_tax_rate
+result = get_amount_subject_to_ss_espec(result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="partner_id" ref="hr_ss" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+
+    <record id="rule_pt_wage_garnishment" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Penhora de Salário</field>
+        <field name="code">PENHORA</field>
+        <field name="sequence">445</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'PENHORA' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -abs(inputs['PENHORA'].amount)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_wage_garnishment_b" model="hr.salary.rule">
+        <field name="category_id" ref="DES" />
+        <field name="name">Penhora de Salário B</field>
+        <field name="code">PENHORA_B</field>
+        <field name="sequence">446</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = "PENHORA_B" in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -abs(inputs["PENHORA_B"]["amount"])</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <!-- TDES -->
+    <record id="rule_pt_total_deduction" model="hr.salary.rule">
+        <field name="category_id" ref="T_DES" />
+        <field name="name">Total Descontos</field>
+        <field name="code">T_DES</field>
+        <field name="sequence">450</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'DES' in categories</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories["DES"]</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <!-- Total a Receber -->
+    <record id="rule_pt_total_receivable_ticket" model="hr.salary.rule">
+        <field name="category_id" ref="T_RECEBER_TIC" />
+        <field name="name">Total a Receber - Ticket</field>
+        <field name="code">T_RECEBER_TIC</field>
+        <field name="sequence">498</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'SUBS_REF_TIC' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = pt_get_result_rules("SUBS_REF_TIC", result_rules)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <record id="rule_pt_total_receivable_in_kind" model="hr.salary.rule">
+        <field name="category_id" ref="T_RECEBER_ESP" />
+        <field name="name">Total a Receber - Espécie</field>
+        <field name="code">T_RECEBER_ESP</field>
+        <field name="sequence">499</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = get_total_amount_in_kind(result_rules_pt)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = get_total_amount_in_kind(result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+    </record>
+
+    <data noupdate="1">
+    <record id="rule_pt_provision_correction_for_holidays" model="hr.salary.rule">
+        <field name="category_id" ref="PROVISAO" />
+        <field name="name">Correção de Provisão de Subs. de Férias</field>
+        <field name="code">CORR_PROV_SUBS_FER</field>
+        <field name="sequence">595</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = bool(payslip.l10n_pt_holiday_allowance_provision_correction_amount)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = payslip.l10n_pt_holiday_allowance_provision_correction_amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="active" eval="False" />
+    </record>
+
+    <record id="rule_pt_provision_for_holidays" model="hr.salary.rule">
+        <field name="category_id" ref="PROVISAO" />
+        <field name="name">Provisão de Subs. de Férias (Ano + 1)</field>
+        <field name="code">PROV_SUBS_FER_1</field>
+        <field name="sequence">600</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = not get_first_year_of_contract(payslip)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = get_provision_for_holidays(payslip, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="active" eval="False" />
+    </record>
+
+    <record id="rule_pt_provision_for_holidays_0" model="hr.salary.rule">
+        <field name="category_id" ref="PROVISAO" />
+        <field name="name">Provisão de Subs. de Férias (Ano 0)</field>
+        <field name="code">PROV_SUBS_FER_0</field>
+        <field name="sequence">605</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = get_first_year_of_contract(payslip)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = get_provision_for_holidays(payslip, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="active" eval="False" />
+    </record>
+
+    <record id="rule_pt_provision_total_for_holidays" model="hr.salary.rule">
+        <field name="category_id" ref="PROVISAO" />
+        <field name="name">Total de Provisão de Subs. de Férias</field>
+        <field name="code">TOT_PROV_SUBS_FER</field>
+        <field name="sequence">606</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = True</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = result_rules["CORR_PROV_SUBS_FER"]["total"] + result_rules["PROV_SUBS_FER_0"]["total"] + result_rules["PROV_SUBS_FER_1"]["total"]
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="active" eval="False" />
+    </record>
+
+    <record id="rule_pt_provision_correction_for_christmas" model="hr.salary.rule">
+        <field name="category_id" ref="PROVISAO" />
+        <field name="name">Correção de Provisão de Subs. de Natal</field>
+        <field name="code">CORR_PROV_SUBS_NAT</field>
+        <field name="sequence">608</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = bool(payslip.l10n_pt_christmas_allowance_provision_correction_amount)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = payslip.l10n_pt_christmas_allowance_provision_correction_amount</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="active" eval="False" />
+    </record>
+
+    <record id="rule_pt_provision_for_christmas" model="hr.salary.rule">
+        <field name="category_id" ref="PROVISAO" />
+        <field name="name">Provisão de Subs. de Natal (Ano + 1)</field>
+        <field name="code">PROV_SUBS_NAT_1</field>
+        <field name="sequence">610</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = not get_first_year_of_contract(payslip)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = get_provision_for_christmas(payslip, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="active" eval="False" />
+    </record>
+
+    <record id="rule_pt_provision_for_christmas_0" model="hr.salary.rule">
+        <field name="category_id" ref="PROVISAO" />
+        <field name="name">Provisão de Subs. de Natal (Ano 0)</field>
+        <field name="code">PROV_SUBS_NAT_0</field>
+        <field name="sequence">615</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = get_first_year_of_contract(payslip)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = get_provision_for_christmas(payslip, result_rules_pt)</field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="active" eval="False" />
+    </record>
+
+    <record id="rule_pt_provision_total_for_christmas" model="hr.salary.rule">
+        <field name="category_id" ref="PROVISAO" />
+        <field name="name">Total de Provisão de Subs. de Natal</field>
+        <field name="code">TOT_PROV_SUBS_NAT</field>
+        <field name="sequence">618</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = True</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = result_rules["CORR_PROV_SUBS_NAT"]["total"] + result_rules["PROV_SUBS_NAT_0"]["total"] + result_rules["PROV_SUBS_NAT_1"]["total"]
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="active" eval="False" />
+    </record>
+
+    <record id="rule_pt_provision_for_social_charges" model="hr.salary.rule">
+        <field name="category_id" ref="PROVISAO" />
+        <field name="name">Provisão de Encargos Sociais</field>
+        <field name="code">PROV_ENCAR_SOCIAIS</field>
+        <field name="sequence">620</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = 'TOT_PROV_SUBS_NAT' in rules or 'TOT_PROV_SUBS_FER' in rules</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = (
+            result_rules["TOT_PROV_SUBS_NAT"]["total"] + result_rules["TOT_PROV_SUBS_FER"]["total"]
+        )
+if result_rules["SS_EP"]["amount"]:
+    result_rate = round(result_rules["SS_EP"]["total"]/result_rules["SS_EP"]["amount"] * 100, 2)
+        </field>
+        <field name="struct_id" ref="hr_payroll_structure_pt_monthly_pay" />
+        <field name="appears_on_payslip" eval="False" />
+        <field name="l10n_pt_standard_rule">True</field>
+        <field name="active" eval="False" />
+    </record>
+    </data>
+
+
+     <!-- Input Type -->
+     <record id="input_pt_kms_in_own_car" model="hr.payslip.input.type">
+        <field name="name">Deslocação em viatura própria [Km's]</field>
+        <field name="code">DES_VPROP</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_kms_in_public_transport" model="hr.payslip.input.type">
+        <field name="name">Deslocação em Transporte Público [Km's]</field>
+        <field name="code">DES_TPUB</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_balance_sheet_gratuities" model="hr.payslip.input.type">
+        <field name="name">Gratificações ao Balanço Sujeitas [valor]</field>
+        <field name="code">GRAT_AO_BAL</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_balance_sheet_gratuities_exempt" model="hr.payslip.input.type">
+        <field name="name">Gratificações ao Balanço Isentas [valor]</field>
+        <field name="code">GRAT_AO_BAL_ISENTAS</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+
+    <record id="input_pt_night_allowance" model="hr.payslip.input.type">
+        <field name="name">Subsídio Noturno [valor]</field>
+        <field name="code">SUBS_NOTURNO</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_per_diems_national" model="hr.payslip.input.type">
+        <field name="name">Ajuda de Custo Nacional [d]</field>
+        <field name="code">AJUD_CUSTO_NAC</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_per_diems_national_75" model="hr.payslip.input.type">
+        <field name="name">Ajuda de Custo Nacional [d] (75%)</field>
+        <field name="code">AJUD_CUSTO_NAC_75</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_per_diems_national_50" model="hr.payslip.input.type">
+        <field name="name">Ajuda de Custo Nacional [d] (50%)</field>
+        <field name="code">AJUD_CUSTO_NAC_50</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_per_diems_national_25" model="hr.payslip.input.type">
+        <field name="name">Ajuda de Custo Nacional [d] (25%)</field>
+        <field name="code">AJUD_CUSTO_NAC_25</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_per_diems_international" model="hr.payslip.input.type">
+        <field name="name">Ajuda de Custo Internacional [d]</field>
+        <field name="code">AJUD_CUSTO_INT</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_per_diems_international_75" model="hr.payslip.input.type">
+        <field name="name">Ajuda de Custo Internacional [d] (75%)</field>
+        <field name="code">AJUD_CUSTO_INT_75</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_per_diems_international_50" model="hr.payslip.input.type">
+        <field name="name">Ajuda de Custo Internacional [d] (50%)</field>
+        <field name="code">AJUD_CUSTO_INT_50</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_per_diems_international_25" model="hr.payslip.input.type">
+        <field name="name">Ajuda de Custo Internacional [d] (25%)</field>
+        <field name="code">AJUD_CUSTO_INT_25</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_prem_bon_oth_sim_monthly_char" model="hr.payslip.input.type">
+        <field
+            name="name"
+        >Prémios, Bónus, outras análogas de caráter mensal [valor]</field>
+        <field name="code">PREM_MENSAL</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record
+        id="input_pt_prem_bon_oth_sim_of_non_monthly_char"
+        model="hr.payslip.input.type"
+    >
+        <field
+            name="name"
+        >Prémios, Bónus, outras análogas de caráter não mensal [valor]</field>
+        <field name="code">PREM_N_MENSAL</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_commissions" model="hr.payslip.input.type">
+        <field name="name">Comissões [valor]</field>
+        <field name="code">COM</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_deduction_health_insurance" model="hr.payslip.input.type">
+        <field name="name">Dedução Seguro de Saúde [valor]</field>
+        <field name="code">DED_SEG_S</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_transport_allowance" model="hr.payslip.input.type">
+        <field name="name">Passes Socias Transporte [valor]</field>
+        <field name="code">PAS_SOC_TRANS</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_meal_allowance_days" model="hr.payslip.input.type">
+        <field name="name">Subsídio de Refeição [d]</field>
+        <field name="code">SUBS_REF_D</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+    <record id="input_pt_prevention_prize" model="hr.payslip.input.type">
+        <field name="name">Prémio de Prevenção [valor]</field>
+        <field name="code">PREM_PREV</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+    <record id="input_pt_productivity_bonus" model="hr.payslip.input.type">
+        <field name="name">Prémio de Produtividade [valor]</field>
+        <field name="code">PREM_PROD</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+    <record id="input_pt_severance_pay" model="hr.payslip.input.type">
+        <field
+            name="name"
+        >Indemnização por Cessação de Contrato sujeita a SS e IRS [valor]</field>
+        <field name="code">IND_CESS_CONT</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+    <record
+        id="input_pt_severance_pay_not_subj_to_ss_and_subj_irs"
+        model="hr.payslip.input.type"
+    >
+        <field
+            name="name"
+        >Indemnização por Cessação de Contrato não sujeita a SS e Sujeita a IRS [valor]</field>
+        <field name="code">IND_CESS_CONT_NAO_SS_SUJ_IRS</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+    <record
+        id="input_pt_severance_pay_not_subj_to_ss_and_not_to_irs"
+        model="hr.payslip.input.type"
+    >
+        <field
+            name="name"
+        >Indemnização por Cessação de Contrato não sujeita a SS nem a IRS [valor]</field>
+        <field name="code">IND_CESS_CONT_NAO_SS_NAO_IRS</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+    <record
+        id="input_pt_trans_all_up_to_the_value_of_the_social_pass"
+        model="hr.payslip.input.type"
+    >
+        <field
+            name="name"
+        >Subsídio transporte até ao valor passe social Art.46 2.t) do CC [valor]</field>
+        <field name="code">SUB_TRANS_VAL_PAS_SOC</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record
+        id="input_pt_taxable_transportation_allowance"
+        model="hr.payslip.input.type"
+    >
+        <field
+            name="name"
+        >Subsídio transporte tributável Art.46 2.t) do CC [valor]</field>
+        <field name="code">SUB_TRANS_TRIB</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_income_in_kind_second_a_cirs" model="hr.payslip.input.type">
+        <field name="name">Rendimentos em espécie (2º- A CIRS) [valor]</field>
+        <field name="code">REND_ESP_2CIRS</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record
+        id="input_pt_other_unspecified_income_in_kind_24_cirs"
+        model="hr.payslip.input.type"
+    >
+        <field
+            name="name"
+        >Outros rendimentos em espécie não especificados (24º CIRS) [valor]</field>
+        <field name="code">OUT_REN_ESP</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_education_ticket" model="hr.payslip.input.type">
+        <field name="name">Ticket Educação [valor]</field>
+        <field name="code">TICKET_EDUC</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_education_ticket_student_check" model="hr.payslip.input.type">
+        <field name="name">Ticket Ensino/Cheque Estudante [valor]</field>
+        <field name="code">TIC_ENS_CHE_EST</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_childcare_vouchers" model="hr.payslip.input.type">
+        <field name="name">Ticket Infância/Cheque Creche [valor]</field>
+        <field name="code">TIC_INF_CHE_CRE</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record
+        id="input_pt_per_diem_without_daily_return_home_not_taxed"
+        model="hr.payslip.input.type"
+    >
+        <field
+            name="name"
+        >Ajudas de Custo sem Regresso Diário à Residência (NÃO TRIBUTADO) [valor]</field>
+        <field name="code">AC_S_REGR_DIA_RES</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record
+        id="input_pt_per_diem_with_daily_return_home_not_taxed"
+        model="hr.payslip.input.type"
+    >
+        <field
+            name="name"
+        >Ajudas de Custo com Regresso Diário à Residência (NÃO TRIBUTADO) [valor]</field>
+        <field name="code">AC_C_REGR_DIA_RES</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_travel_allowance" model="hr.payslip.input.type">
+        <field name="name">Subsídio de Deslocação [d]</field>
+        <field name="code">SUBS_DESLO</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_personal_use_of_a_car" model="hr.payslip.input.type">
+        <field
+            name="name"
+        >Utilização Pessoal de Viatura Automóvel (com incidência de SS) [valor]</field>
+        <field name="code">UT_PES_VA</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record
+        id="input_pt_personal_use_of_a_car_without_ss"
+        model="hr.payslip.input.type"
+    >
+        <field
+            name="name"
+        >Utilização Pessoal de Viatura Automóvel (sem incidência de SS) [valor]</field>
+        <field name="code">UT_PES_VA_SEM_SS</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record
+        id="input_pt_discount_days_per_contract_start"
+        model="hr.payslip.input.type"
+    >
+        <field name="name">Desconto Dias por Início/Fim de Contrato [valor]</field>
+        <field name="code">FALTA280</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_wage_garnishment" model="hr.payslip.input.type">
+        <field name="name">Penhora de Salário [valor]</field>
+        <field name="code">PENHORA</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_wage_garnishment_b" model="hr.payslip.input.type">
+        <field name="name">Penhora de Salário B [valor]</field>
+        <field name="code">PENHORA_B</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_unused_holidays" model="hr.payslip.input.type">
+        <field name="name">Férias não Gozadas [d]</field>
+        <field name="code">FER_NAO_GOZ</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_unused_holidays_amount" model="hr.payslip.input.type">
+        <field name="name">Valor dia de Férias não Gozadas [valor]</field>
+        <field name="code">FER_NAO_GOZ_AMOUNT</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_christmas_allowance_pro" model="hr.payslip.input.type">
+        <field name="name">Subsídio de Natal - Proporcionais [valor]</field>
+        <field name="code">SUBS_NATAL_PROP</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_christmas_allowance" model="hr.payslip.input.type">
+        <field name="name">Subsídio de Natal [valor]</field>
+        <field name="code">SUBS_NAT</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_holiday_allowance_pro" model="hr.payslip.input.type">
+        <field name="name">Subsídio de Férias - Proporcionais [valor]</field>
+        <field name="code">SUBS_FER_PROP</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_holiday_allowance_previous_year" model="hr.payslip.input.type">
+        <field name="name">Subsídio de Férias - Ano Anterior [valor]</field>
+        <field name="code">SUBS_FER_ANOS_ANT</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_holiday_allowance" model="hr.payslip.input.type">
+        <field name="name">Subsídio de Férias [valor]</field>
+        <field name="code">SUBS_FER</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_remote_work_expense_electricity" model="hr.payslip.input.type">
+        <field name="name">Despesas em Teletrabalho - Eletricidade [d]</field>
+        <field name="code">DES_TEL_ELET</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_remote_work_expense_internet" model="hr.payslip.input.type">
+        <field name="name">Despesas em Teletrabalho - Internet [d]</field>
+        <field name="code">DES_TEL_INTE</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record
+        id="input_pt_remote_work_expense_computer_equipment"
+        model="hr.payslip.input.type"
+    >
+        <field
+            name="name"
+        >Despesas em Teletrabalho - Equipamento Informática [d]</field>
+        <field name="code">DES_TEL_EQU_INF</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime100" model="hr.payslip.input.type">
+        <field name="name">Hora Extra 1º Hora [h]</field>
+        <field name="code">EXTRA100</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime200" model="hr.payslip.input.type">
+        <field name="name">Hora Extra Horas Seguintes [h]</field>
+        <field name="code">EXTRA200</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime300" model="hr.payslip.input.type">
+        <field name="name">Hora Extra Dias de Descanso [h]</field>
+        <field name="code">EXTRA300</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime400" model="hr.payslip.input.type">
+        <field name="name">Hora Extra Dias Úteis [h]</field>
+        <field name="code">EXTRA400</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime500" model="hr.payslip.input.type">
+        <field name="name">Hora Extra Feriados [h]</field>
+        <field name="code">EXTRA500</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime600" model="hr.payslip.input.type">
+        <field name="name">Hora Extra Sábados e Feriados [h]</field>
+        <field name="code">EXTRA600</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime700" model="hr.payslip.input.type">
+        <field name="name">Hora Extra Domingo [h]</field>
+        <field name="code">EXTRA700</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime800" model="hr.payslip.input.type">
+        <field name="name">Hora Extra em período Noturno 1º Hora [h]</field>
+        <field name="code">EXTRA800</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime900" model="hr.payslip.input.type">
+        <field name="name">Hora Extra em período Noturno Horas Seguintes [h]</field>
+        <field name="code">EXTRA900</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime1000" model="hr.payslip.input.type">
+        <field name="name">Hora Extra em período Noturno Dias de Descanso [h]</field>
+        <field name="code">EXTRA1000</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime1100" model="hr.payslip.input.type">
+        <field name="name">Hora Extra em período Noturno Dias Úteis [h]</field>
+        <field name="code">EXTRA1100</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime1200" model="hr.payslip.input.type">
+        <field name="name">Hora Extra em período Noturno Feriados [h]</field>
+        <field name="code">EXTRA1200</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime1300" model="hr.payslip.input.type">
+        <field name="name">Hora Extra em período Noturno Sábado e Feriados [h]</field>
+        <field name="code">EXTRA1300</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime1400" model="hr.payslip.input.type">
+        <field name="name">Hora Extra em período Noturno Domingos [h]</field>
+        <field name="code">EXTRA1400</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime1500_extra" model="hr.payslip.input.type">
+        <field name="name">Hora Extra 1º Hora [h] a partir da 100º hora</field>
+        <field name="code">EXTRA1500</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime1600" model="hr.payslip.input.type">
+        <field name="name">Hora Extra Horas Seguintes [h] a partir da 100º hora</field>
+        <field name="code">EXTRA1600</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime1700" model="hr.payslip.input.type">
+        <field name="name">Hora Extra Dias de Descanso [h] a partir da 100º hora</field>
+        <field name="code">EXTRA1700</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime1800" model="hr.payslip.input.type">
+        <field name="name">Hora Extra Dias Úteis [h] a partir da 100º hora</field>
+        <field name="code">EXTRA1800</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime1900" model="hr.payslip.input.type">
+        <field name="name">Hora Extra Feriados [h] a partir da 100º hora</field>
+        <field name="code">EXTRA1900</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime2000" model="hr.payslip.input.type">
+        <field
+            name="name"
+        >Hora Extra Sábados e Feriados [h] a partir da 100º hora</field>
+        <field name="code">EXTRA2000</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime2100" model="hr.payslip.input.type">
+        <field name="name">Hora Extra Domingo [h] a partir da 100º hora</field>
+        <field name="code">EXTRA2100</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_overtime1500" model="hr.payslip.input.type">
+        <field name="name">Trabalho Noturno [h]</field>
+        <field name="code">TRAB_NOT</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_two_shift_regime" model="hr.payslip.input.type">
+        <field name="name">Regime de 2 Turnos [valor]</field>
+        <field name="code">REG_2_TUR</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_three_shift_regime" model="hr.payslip.input.type">
+        <field name="name">Regime de 3 Turnos [valor]</field>
+        <field name="code">REG_3_TUR</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_four_shift_regime" model="hr.payslip.input.type">
+        <field name="name">Regime de 4 Turnos [valor]</field>
+        <field name="code">REG_4_TUR</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_five_shift_regime" model="hr.payslip.input.type">
+        <field name="name">Regime de 5 Turnos [valor]</field>
+        <field name="code">REG_5_TUR</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record
+        id="input_pt_remuneration_or_backdating_adjustments"
+        model="hr.payslip.input.type"
+    >
+        <field name="name">Acertos de Remunerações ou Retroativos [valor]</field>
+        <field name="code">ACER_REM_RETROA</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_meal_allowance_not_taxed" model="hr.payslip.input.type">
+        <field name="name">Subs. Alimentação (NAO TRIBUTADO) [valor]</field>
+        <field name="code">SUBS_REF_NAO_TRIB</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+
+    <record id="input_pt_work_schedule_exemption" model="hr.payslip.input.type">
+        <field name="name">Isenção Horário de Trabalho [valor]</field>
+        <field name="code">ISENCAO_HOR_TRAB</field>
+        <field name="country_id" ref="base.pt" />
+        <field
+            name="struct_ids"
+            eval="[(4, ref('ptplus_payroll_ee.hr_payroll_structure_pt_monthly_pay'))]"
+        />
+    </record>
+</odoo>
