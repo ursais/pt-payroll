@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="insurance_1001" model="hr.insurance.company.pt">
+        <field name="code">1001</field>
+        <field name="name">Açoreana - Seguradoras Unidas, SA</field>
+    </record>
+
+    <record id="insurance_1010" model="hr.insurance.company.pt">
+        <field name="code">1010</field>
+        <field name="name">Liberty Seguros, SA</field>
+    </record>
+
+    <record id="insurance_1011" model="hr.insurance.company.pt">
+        <field name="code">1011</field>
+        <field name="name">Fidelidade Companhia de Seguros, SA</field>
+    </record>
+
+    <record id="insurance_1020" model="hr.insurance.company.pt">
+        <field name="code">1020</field>
+        <field name="name">Mútua dos Pescadores - C.R.L</field>
+    </record>
+
+    <record id="insurance_1023" model="hr.insurance.company.pt">
+        <field name="code">1023</field>
+        <field name="name">Ocidental - Companhia Portuguesa de Seguros, SA</field>
+    </record>
+
+    <record id="insurance_1026" model="hr.insurance.company.pt">
+        <field name="code">1026</field>
+        <field name="name">Lusitânia Companhia de Seguros, SA</field>
+    </record>
+
+    <record id="insurance_1028" model="hr.insurance.company.pt">
+        <field name="code">1028</field>
+        <field name="name">Companhia de Seguros Allianz Portugal, SA</field>
+    </record>
+
+    <record id="insurance_1037" model="hr.insurance.company.pt">
+        <field name="code">1037</field>
+        <field name="name">Tranquilidade - Seguradoras Unidas, SA</field>
+    </record>
+
+    <record id="insurance_1097" model="hr.insurance.company.pt">
+        <field name="code">1097</field>
+        <field name="name">Groupama Seguros, SA</field>
+    </record>
+
+    <record id="insurance_1122" model="hr.insurance.company.pt">
+        <field name="code">1122</field>
+        <field name="name">CA Seguros, SA</field>
+    </record>
+
+    <record id="insurance_1129" model="hr.insurance.company.pt">
+        <field name="code">1129</field>
+        <field name="name">Ageas Portugal, Companhia de Seguros, SA</field>
+    </record>
+
+    <record id="insurance_1133" model="hr.insurance.company.pt">
+        <field name="code">1133</field>
+        <field name="name">Caravela - Companhia de Seguros, SA</field>
+    </record>
+
+    <record id="insurance_1134" model="hr.insurance.company.pt">
+        <field name="code">1134</field>
+        <field name="name">GNB - Companhia de Seguros, SA</field>
+    </record>
+
+    <record id="insurance_1145" model="hr.insurance.company.pt">
+        <field name="code">1145</field>
+        <field name="name">Mapfre Seguros Gerais, SA</field>
+    </record>
+
+    <record id="insurance_1160" model="hr.insurance.company.pt">
+        <field name="code">1160</field>
+        <field name="name">Vitória Seguros</field>
+    </record>
+
+    <record id="insurance_1167" model="hr.insurance.company.pt">
+        <field name="code">1167</field>
+        <field name="name">Popular Seguros - Companhia de Seguros, SA</field>
+    </record>
+
+    <record id="insurance_1184" model="hr.insurance.company.pt">
+        <field name="code">1184</field>
+        <field name="name">Zurich Companhia de Seguros Vida, SA</field>
+    </record>
+
+    <record id="insurance_1185" model="hr.insurance.company.pt">
+        <field name="code">1185</field>
+        <field name="name">Murimar Seguros</field>
+    </record>
+
+    <record id="insurance_1194" model="hr.insurance.company.pt">
+        <field name="code">1194</field>
+        <field name="name">Generali Companhia de Seguros, SA</field>
+    </record>
+
+    <record id="insurance_1197" model="hr.insurance.company.pt">
+        <field name="code">1197</field>
+        <field name="name">Seguradoras Unidas, SA</field>
+    </record>
+</odoo>
