@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_salary_complement_pt_user,access.hr.salary.complement.pt,model_hr_salary_complement_pt,base.group_user,0,0,0,0
+access_hr_salary_complement_pt_hr_manager,access.hr.salary.complement.pt.hr.manager,model_hr_salary_complement_pt,hr_payroll.group_hr_payroll_manager,1,1,1,1
+access_hr_salary_complement_pt_hr_user,access.hr.salary.complement.pt.hr.user,model_hr_salary_complement_pt,hr_payroll.group_hr_payroll_user,1,1,1,1
+access_hr_allowance_provision_correction_pt_user,access.hr.allowance.provision.correction.pt,model_hr_allowance_provision_correction_pt,base.group_user,1,0,0,0
+access_hr_allowance_provision_correction_pt_manager,access.hr.allowance.provision.correction.pt,model_hr_allowance_provision_correction_pt,hr.group_hr_manager,1,1,1,0
+access_hr_allowance_provision_correction_lines_pt_user,access.hr.allowance.provision.correction.lines.pt,model_hr_allowance_provision_correction_lines_pt,base.group_user,1,0,0,0
+access_hr_allowance_provision_correction_lines_pt_manager,access.hr.allowance.provision.correction.lines.pt,model_hr_allowance_provision_correction_lines_pt,hr.group_hr_manager,1,1,0,0
+access_dataport_log,dataport.log user,ptplus.model_dataport_log,hr_payroll.group_hr_payroll_user,1,0,0,0
+access_dataport_log_manager,dataport.log manager,ptplus.model_dataport_log,hr_payroll.group_hr_payroll_manager,1,1,1,1

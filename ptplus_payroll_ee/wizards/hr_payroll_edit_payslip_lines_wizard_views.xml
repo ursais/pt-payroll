@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="hr_payroll_edit_payslip_lines_form_wizard_pt" model="ir.ui.view">
+        <field name="name">hr.payroll.edit.payslip.lines.wizard.view.form.pt</field>
+        <field name="model">hr.payroll.edit.payslip.lines.wizard</field>
+        <field
+            name="inherit_id"
+            ref="hr_payroll.hr_payroll_edit_payslip_lines_form_wizard"
+        />
+        <field name="arch" type="xml">
+
+            <field name="total" position="after">
+                <field name="l10n_pt_amount_subject_to_it" optional="hide" />
+                <field name="l10n_pt_amount_exempt_to_it" optional="hide" />
+                <field name="l10n_pt_amount_subject_to_ss" optional="hide" />
+            </field>
+
+            <xpath
+                expr="//field[@name='line_ids']/list/field[@name='slip_id']"
+                position="after"
+            >
+                <field name="country_code" column_invisible="1" />
+                <field name="l10n_pt_is_leave" column_invisible="1" />
+            </xpath>
+
+            <xpath
+                expr="//field[@name='line_ids']/list/field[@name='quantity']"
+                position="attributes"
+            >
+                <attribute
+                    name="readonly"
+                >code in ['SUBS_NAT_TRIBUTADO', 'SUBS_FER_TRIBUTADO', 'SS_EP', 'SS', 'IRS_SOMA_BASE', 'IRS_SOMA_BASE_TOTAL', 'IRS', 'T_RECEBER_TIC', 'NET', 'T_DES'] or l10n_pt_is_leave == True
+                </attribute>
+            </xpath>
+
+            <xpath
+                expr="//field[@name='line_ids']/list/field[@name='amount']"
+                position="attributes"
+            >
+               <attribute
+                    name="readonly"
+                >code in ['SUBS_NAT_TRIBUTADO', 'SUBS_FER_TRIBUTADO', 'SS_EP', 'SS', 'IRS_SOMA_BASE', 'IRS_SOMA_BASE_TOTAL', 'IRS', 'T_RECEBER_TIC', 'NET', 'T_DES'] or l10n_pt_is_leave == True
+               </attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='worked_days_line_ids']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='worked_days_line_ids']" position="after">
+                <field
+                    name="worked_days_line_ids"
+                    widget="l10n_pt_worked_days_line_one2many"
+                    nolabel="1"
+                    context="{'default_slip_id': payslip_id}"
+                >
+                    <list name="Worked Days" editable="bottom" delete="0">
+                        <field
+                            name="country_code"
+                            optional="hide"
+                            column_invisible="1"
+                        />
+                        <field
+                            name="l10n_pt_is_leave"
+                            optional="hide"
+                            column_invisible="1"
+                        />
+                        <field name="work_entry_type_id" />
+                        <field name="name" required="1" />
+                        <field name="number_of_days" />
+                        <field name="number_of_hours" />
+                        <field name="code" optional="hide" />
+                        <field name="amount" readonly="country_code == 'PT'" />
+                        <field
+                            name="l10n_pt_missing_days_for_dri_curr_period"
+                            optional="hide"
+                            readonly="not l10n_pt_is_leave"
+                        />
+                        <field
+                            name="l10n_pt_leave_amount_curr_period"
+                            optional="hide"
+                            readonly="not l10n_pt_is_leave"
+                        />
+                        <field
+                            name="l10n_pt_missing_days_for_dri_prev_period"
+                            optional="hide"
+                            readonly="not l10n_pt_is_leave"
+                        />
+                        <field
+                            name="l10n_pt_leave_amount_prev_period"
+                            optional="hide"
+                            readonly="not l10n_pt_is_leave"
+                        />
+                    </list>
+                </field>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>
