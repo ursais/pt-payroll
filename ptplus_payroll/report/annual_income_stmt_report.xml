@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="action_report_annual_income_stmt_pt" model="ir.actions.report">
+        <field name="name">Income Statement</field>
+        <field name="model">payroll.statement.wizard.pt</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ptplus_payroll.report_annual_income_stmt_pt</field>
+        <field name="report_file">ptplus_payroll.report_annual_income_stmt_pt</field>
+    </record>
+
+    <template id="report_annual_income_stmt_pt">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                <div class="page">
+                    <t t-foreach="employees" t-as="e">
+                        <t t-if="slips.filtered(lambda slip: slip.employee_id == e)">
+                        <div style="page-break-after: always;">
+                            <p>
+                                Nos termos do nº 1, alinea b) do art. 119º, do CIRS, <span
+                                            t-esc="e.name"
+                                        />, com residência em <span
+                                            t-esc="e.address_home_id.contact_address"
+                                        />,
+                                contribuinte nº <span
+                                            t-esc="o.format_pt_vat(e.address_home_id.vat)"
+                                        />, <span
+                                            t-esc="o.get_marital_status_str(e)"
+                                        />, com <span
+                                            t-esc="e.children"
+                                        /> dependente/s,
+                                auferiu, no ano de <span
+                                            t-esc="o.date_from.year"
+                                        />, os seguintes rendimentos relativos a trabalho dependente - Categoria A:
+                            </p>
+                            <t
+                                        t-set="amounts"
+                                        t-value="o.get_income_for_employee(e, slips)"
+                                    />
+                            <t t-set="exempts_it" t-value="amounts['exempts_it']" />
+                            <t t-set="subjects_it" t-value="amounts['subjects_it']" />
+                            <t
+                                        t-set="subject_to_tax"
+                                        t-value="amounts['subject_to_tax']"
+                                    />
+
+                            <p>
+                                <strong
+                                        >Total de Rendimentos Ilíquidos Sujeitos referentes a
+                                    <span t-esc="o.date_from.year" /> <br />
+                                    <t
+                                                t-esc="sum(subjects_it.values())"
+                                                t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                            />
+                                </strong>
+                            </p>
+                            <t t-foreach="subjects_it.items()" t-as="s_it">
+                                <t t-set="rule" t-value="s_it[0]" />
+                                <t t-set="amount" t-value="s_it[1]" />
+                                <p style="margin-left: 25px;">
+                                    <span
+                                                t-esc="o.get_description_on_slip_str(rule)"
+                                            /> <br />
+                                    <span
+                                                t-esc="amount"
+                                                t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                            />
+                                </p>
+                            </t>
+
+                            <p>
+                                <strong
+                                        >Total de Rendimentos Ilíquidos Não Sujeitos referentes a <span
+                                                t-esc="o.date_from.year"
+                                            /> <br />
+                                <t
+                                                t-esc="sum(exempts_it.values())"
+                                                t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                            />
+                                </strong>
+                            </p>
+                            <t t-foreach="exempts_it.items()" t-as="e_it">
+                                <t t-set="rule" t-value="e_it[0]" />
+                                <t t-set="amount" t-value="e_it[1]" />
+                                <p style="margin-left: 25px;">
+                                    <span
+                                                t-esc="o.get_description_on_slip_str(rule)"
+                                            /> <br />
+                                    <span
+                                                t-esc="amount"
+                                                t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                            />
+                                </p>
+                            </t>
+
+                            <p>
+                                <strong>
+                                    Total de Descontos referentes a  <span
+                                                t-esc="o.date_from.year"
+                                            /> <br />
+                                    <t
+                                                t-esc="abs(sum(subject_to_tax.values()))"
+                                                t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                            />
+                                </strong>
+                            </p>
+                            <t t-foreach="subject_to_tax.items()" t-as="s_to_tax">
+                                <t t-set="rule" t-value="s_to_tax[0]" />
+                                <t t-set="amount" t-value="s_to_tax[1]" />
+                                <p style="margin-left: 25px;">
+                                    <span
+                                                t-esc="o.get_description_on_slip_str(rule)"
+                                            /> <br />
+                                    <span
+                                                t-esc="abs(amount)"
+                                                t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                            />
+                                </p>
+                            </t>
+                        </div>
+                        </t>
+                    </t>
+                </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

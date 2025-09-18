@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="res_partner_view_form_private_pt" model="ir.ui.view">
+        <field name="name">res.partner.view.form.private.pt</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.res_partner_view_form_private" />
+        <field name="arch" type="xml">
+            <xpath expr="//group/group/div" position="after">
+                <field
+                    name="vat"
+                    placeholder="e.g. BE0477472701"
+                    attrs="{'readonly': [('parent_id','!=',False)]}"
+                />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_partner_view_partner_form_pt" model="ir.ui.view">
+        <field name="name">res.partner.view.form.private.pt</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <group name="establishment_information_pt" position="before">
+                <field name="l10n_pt_is_establishment" invisible="1" />
+            </group>
+
+            <group name="establishment_information_pt" position="attributes">
+                <attribute
+                    name="attrs"
+                >{'invisible': ['|', ('fiscal_country_codes', '!=', 'PT'), ('l10n_pt_is_establishment', '=', False)]}</attribute>
+            </group>
+        </field>
+    </record>
+
+</odoo>

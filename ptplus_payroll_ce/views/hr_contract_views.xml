@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="hr_contract_view_inherit_form_pt" model="ir.ui.view">
+        <field name="name">hr.contract.form.pt</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="ptplus_payroll.hr_contract_view_form_pt" />
+        <field name="arch" type="xml">
+            <field name="l10n_pt_hours_to_count_for_daily_meal" position="attributes">
+                <attribute name="attrs">{'invisible': True}</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>
