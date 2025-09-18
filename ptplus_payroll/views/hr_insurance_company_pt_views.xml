@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="hr_insurance_company_pt_view_search" model="ir.ui.view">
+        <field name="name">hr.insurance.company.pt.search</field>
+        <field name="model">hr.insurance.company.pt</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code" />
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+
+    <record id="hr_insurance_company_pt_view_tree" model="ir.ui.view">
+        <field name="name">hr.insurance.company.pt.tree</field>
+        <field name="model">hr.insurance.company.pt</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code" />
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_insurance_company_pt_view_form" model="ir.ui.view">
+        <field name="name">hr.insurance.company.pt.form</field>
+        <field name="model">hr.insurance.company.pt</field>
+        <field name="arch" type="xml">
+            <form string="Insurance">
+                <sheet>
+                    <group>
+                        <field name="code" />
+                        <field name="name" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_insurance_company_pt_action" model="ir.actions.act_window">
+        <field name="name">Insurances</field>
+        <field name="res_model">hr.insurance.company.pt</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="hr_insurance_company_pt_view_tree" />
+        <field name="search_view_id" ref="hr_insurance_company_pt_view_search" />
+    </record>
+
+    <menuitem
+        id="menu_hr_insurance_company_pt_action"
+        action="hr_insurance_company_pt_action"
+        sequence="2"
+    />
+
+</odoo>
