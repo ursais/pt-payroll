@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_employee_form_pt" model="ir.ui.view">
+        <field name="name">hr.employee.form.pt</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form" />
+        <field name="arch" type="xml">
+            <field name="active" position="after">
+                <field name="company_country_id" invisible="1" />
+                <field name="company_country_code" invisible="1" />
+            </field>
+            <xpath expr="//field[@name='passport_id']" position="attributes">
+                <attribute name="invisible">company_country_code == 'PT'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='spouse_birthdate']" position="after">
+                <field
+                    name="l10n_pt_no_of_holders"
+                    invisible="company_country_code != 'PT' or marital not in ['married', 'cohabitant']"
+                />
+                <field
+                    name="l10n_pt_disability_spouse"
+                    invisible="company_country_code != 'PT' or marital not in ['married', 'cohabitant']"
+                />
+                <field
+                    name="l10n_pt_disability_degree_of_the_spouse"
+                    widget="percentage"
+                    invisible="company_country_code != 'PT' or marital not in ['married', 'cohabitant'] or not l10n_pt_disability_spouse"
+                />
+                <field
+                    name="l10n_pt_spouse_does_not_earn_category_a_or_h_income"
+                    invisible="company_country_code != 'PT' or marital not in ['married', 'cohabitant'] or not l10n_pt_disability_spouse"
+                />
+            </xpath>
+            <xpath expr="//field[@name='children']" position="after">
+                <field
+                    name="l10n_pt_no_of_dependents_education_ticket"
+                    invisible="company_country_code != 'PT'"
+                />
+                <field
+                    name="l10n_pt_no_of_dep_wit_perm_disab_equal_to_or_gre_than_60"
+                    invisible="company_country_code != 'PT'"
+                />
+                <field
+                    name="l10n_pt_multiplication_factor_for_disabled"
+                    invisible="not l10n_pt_no_of_dep_wit_perm_disab_equal_to_or_gre_than_60"
+                />
+            </xpath>
+            <xpath expr="//field[@name='country_id']" position="after">
+                <field
+                    name="l10n_pt_identification_type"
+                    invisible="company_country_code != 'PT'"
+                />
+            </xpath>
+            <xpath expr="//page[@name='personal_information']/group">
+                 <group string="Fiscal data" invisible="company_country_code != 'PT'">
+                    <field name="l10n_pt_vat" placeholder="e.g. PT123456789" />
+                    <field name="l10n_pt_income_tax_rate" widget="percentage" />
+                    <field name="l10n_pt_income_tax_region" />
+                    <field
+                        name="l10n_pt_special_fiscal_regime_id"
+                        widget="many2many_tags"
+                        options="{'no_create': True}"
+                    />
+                    <field name="l10n_pt_tax_office_id" />
+                    <field name="l10n_pt_disability" />
+                    <field
+                        name="l10n_pt_disability_degree"
+                        widget="percentage"
+                        invisible="not l10n_pt_disability"
+                    />
+                    <field
+                        name="l10n_pt_disabilit_armed_forces"
+                        invisible="not l10n_pt_disability"
+                    />
+                     <field name="l10n_pt_pensioner" />
+                     <field name="l10n_pt_red_of_wit_tax_form_home_loan_holders" />
+                </group>
+                <group
+                    string="Social Securaty Information"
+                    invisible="company_country_code != 'PT'"
+                >
+                    <field name="l10n_pt_contract_modality" />
+                    <field name="l10n_pt_employee_type_id" />
+                </group>
+                <group
+                    string="Professional Information"
+                    invisible="company_country_code != 'PT'"
+                >
+                    <field name="l10n_pt_intern" />
+                    <field name="l10n_pt_corporate_body" />
+                    <field
+                        name="l10n_pt_deducts_ss_from_another_company"
+                        invisible="not l10n_pt_corporate_body"
+                    />
+                    <field name="l10n_pt_goverment_member" />
+                    <field name="l10n_pt_temporary_worker" />
+                    <field name="l10n_pt_qualification_id" />
+                    <field name="l10n_pt_qualification_level" />
+                    <field name="l10n_pt_profession_id" />
+                    <field name="l10n_pt_profession_situation" />
+                    <field name="l10n_pt_irct" />
+                    <field name="l10n_pt_professional_category" />
+                    <field name="l10n_pt_syndicate" />
+                    <field name="l10n_pt_non_resident" />
+                </group>
+                <group string="Insurance" invisible="company_country_code != 'PT'">
+                    <field name="l10n_pt_insurance_company_id" />
+                    <field name="l10n_pt_insurance_policy_no" />
+                    <field name="l10n_pt_insurance_type" />
+                    <field name="l10n_pt_insurance_expiry_date" />
+                </group>
+            </xpath>
+            <xpath expr="//label[@for='private_street']" position="before">
+                <field
+                    name="l10n_pt_full_name"
+                    invisible="company_country_code != 'PT'"
+                />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_employee_tree_pt" model="ir.ui.view">
+        <field name="name">hr.employee.list.pt</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_tree" />
+        <field name="arch" type="xml">
+            <field name="parent_id" position="after">
+                <field name="l10n_pt_insurance_company_id" optional="hide" />
+                <field name="l10n_pt_insurance_policy_no" optional="hide" />
+            </field>
+        </field>
+    </record>
+</odoo>

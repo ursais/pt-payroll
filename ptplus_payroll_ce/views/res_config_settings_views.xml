@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_config_settings_view_form_pt" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.pt</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="45" />
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <field name="product_volume_volume_in_cubic_feet" position="after">
+                <field name="country_code" invisible="1" />
+            </field>
+            <xpath expr="//block[@id='payroll_accountant']" position="after">
+                <block
+                    title="Portugal Localization"
+                    name="pt_payroll"
+                    invisible="country_code != 'PT'"
+                >
+                    <setting
+                        string="Default Values"
+                        help="Configure Default Values for Employee Contract"
+                        company_dependent="1"
+                    >
+                        <div class="content-group">
+                            <div class="row mt16">
+                                <label
+                                    string="Meal Allowance Payment Method"
+                                    for="l10n_pt_default_meal_allowance_payment_method"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_meal_allowance_payment_method"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Meal Allowance Amount Paid in Ticket"
+                                    for="l10n_pt_default_meal_allowance_amount_paid_in_ticket"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_meal_allowance_amount_paid_in_ticket"
+                                    widget="monetary"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Meal Allowance Amount Paid in Cash"
+                                    for="l10n_pt_default_meal_allowance_amount_paid_in_cash"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_meal_allowance_amount_paid_in_cash"
+                                    widget="monetary"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Meal Allowance Amount Paid in Kind"
+                                    for="l10n_pt_default_meal_allowance_amount_paid_in_kind"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_meal_allowance_amount_paid_in_kind"
+                                    widget="monetary"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Meal Allowance Amount Paid in Kind"
+                                    for="l10n_pt_default_hours_to_count_for_daily_meal"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_hours_to_count_for_daily_meal"
+                                    widget="monetary"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Hours to Count for Daily Meal"
+                                    for="l10n_pt_default_hours_to_count_for_daily_meal"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_hours_to_count_for_daily_meal"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Holiday Allowance Payment Method"
+                                    for="l10n_pt_default_holiday_allowance_payment_method"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_holiday_allowance_payment_method"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Holiday Allowance Payment Method"
+                                    for="l10n_pt_default_holiday_allowance_payment_method"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_holiday_allowance_payment_method"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Holiday Allowance Payment Month"
+                                    for="l10n_pt_default_holiday_allowance_payment_month"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_holiday_allowance_payment_month"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Christmas Allowance Payment Method"
+                                    for="l10n_pt_default_christmas_allowance_payment_method"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_christmas_allowance_payment_method"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Christmas Allowance Payment Month"
+                                    for="l10n_pt_default_christmas_allowance_payment_month"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_christmas_allowance_payment_month"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Overtime First Hour Rate"
+                                    for="l10n_pt_default_overtime_first_hour_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_overtime_first_hour_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Overtime Remaining Hours Rate"
+                                    for="l10n_pt_default_overtime_remaining_hours_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_overtime_remaining_hours_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Overtime Rest Days Rate"
+                                    for="l10n_pt_default_overtime_rest_days_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_overtime_rest_days_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Overtime Workdays Rate"
+                                    for="l10n_pt_default_overtime_workdays_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_overtime_workdays_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Overtime Holidays Rate"
+                                    for="l10n_pt_default_overtime_holidays_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_overtime_holidays_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Overtime Saturday and Holidays Rate"
+                                    for="l10n_pt_default_overtime_saturday_and_holidays_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_overtime_saturday_and_holidays_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Overtime Sunday Rate"
+                                    for="l10n_pt_default_overtime_sunday_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_overtime_sunday_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Night Overtime First Hour Rate"
+                                    for="l10n_pt_default_night_overtime_first_hour_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_night_overtime_first_hour_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Night Overtime Remaining Hours Rate"
+                                    for="l10n_pt_default_night_overtime_remaining_hours_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_night_overtime_remaining_hours_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Night Overtime Rest Days Rate"
+                                    for="l10n_pt_default_night_overtime_rest_days_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_night_overtime_rest_days_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Night Overtime Workdays Rate"
+                                    for="l10n_pt_default_night_overtime_workdays_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_night_overtime_workdays_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Night Overtime Holidays Rate"
+                                    for="l10n_pt_default_night_overtime_holidays_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_night_overtime_holidays_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Night Overtime Saturday and Holidays Rate"
+                                    for="l10n_pt_default_night_overtime_saturday_and_holidays_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_night_overtime_saturday_and_holidays_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Night Overtime Sunday Rate"
+                                    for="l10n_pt_default_night_overtime_sunday_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_night_overtime_sunday_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Night Work Rate"
+                                    for="l10n_pt_default_night_work_rate"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_night_work_rate"
+                                    widget="percentage"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Value per Km in Own Vehicle"
+                                    for="l10n_pt_default_value_per_km_in_own_vehicle"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_value_per_km_in_own_vehicle"
+                                    widget="monetary"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Value per Km in Public Transport"
+                                    for="l10n_pt_default_value_per_km_in_public_transport"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_value_per_km_in_public_transport"
+                                    widget="monetary"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Per Diem National"
+                                    for="l10n_pt_default_per_diem_national"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_per_diem_national"
+                                    widget="monetary"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Per Diem International"
+                                    for="l10n_pt_default_per_diem_international"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_per_diem_international"
+                                    widget="monetary"
+                                />
+                            </div>
+                            <!--Work Expense-->
+                            <div class="row mt16">
+                                <label
+                                    string="Remote Work Expense Electricity"
+                                    for="l10n_pt_default_remote_work_expense_electricity"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_remote_work_expense_electricity"
+                                    widget="monetary"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Remote Work Expense Internet"
+                                    for="l10n_pt_default_remote_work_expense_internet"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_remote_work_expense_internet"
+                                    widget="monetary"
+                                />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    string="Remote Work Expense Computer Equipment"
+                                    for="l10n_pt_default_remote_work_expense_computer_equipment"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field
+                                    name="l10n_pt_default_remote_work_expense_computer_equipment"
+                                    widget="monetary"
+                                />
+                            </div>
+                        </div>
+                    </setting>
+
+                    <setting
+                        string="Fiscal Data"
+                        help="Configure Fiscal Data"
+                        company_dependent="1"
+                    >
+                        <div class="content-group">
+                            <div class="row mt16">
+                                <label
+                                    for="account_officer_vat"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field name="account_officer_vat" />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    for="l10n_pt_representative_vat"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field name="l10n_pt_representative_vat" />
+                            </div>
+                            <div class="row mt16">
+                                <label
+                                    for="l10n_pt_nissee"
+                                    class="col-lg-6 o_light_label"
+                                />
+                                <field name="l10n_pt_nissee" />
+                            </div>
+                        </div>
+                    </setting>
+
+                    <setting
+                        string="Company Headquarters"
+                        help="Define the company headquarters"
+                        company_dependent="1"
+                    >
+                        <field name="l10n_pt_company_headquarters" />
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
