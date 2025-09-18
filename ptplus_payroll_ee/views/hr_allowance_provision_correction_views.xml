@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="hr_allowance_provision_correction_pt_view_tree" model="ir.ui.view">
+        <field name="name">hr.allowance.provision.correction.pt.tree</field>
+        <field name="model">hr.allowance.provision.correction.pt</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" optional="show" />
+                <field name="company_id" optional="show" />
+                <field
+                    name="employee_ids"
+                    widget="many2many_avatar_employee"
+                    optional="show"
+                />
+                <field
+                    name="create_uid"
+                    widget="many2one_avatar_user"
+                    optional="show"
+                />
+                <field name="create_date" optional="show" />
+                <field name="type" optional="show" />
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="hr_allowance_provision_correction_pt_view_form" model="ir.ui.view">
+        <field name="name">hr.allowance.provision.correction.pt.form</field>
+        <field name="model">hr.allowance.provision.correction.pt</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        string="Correct Provisions"
+                        name="correct_provisions"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state == 'done'"
+                    />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="create_uid" widget="many2one_avatar_user" />
+<!--                            <field name="reference_year" widget="char"/>-->
+                            <field name="company_id" />
+                        </group>
+                        <group>
+                            <field name="type" readonly="state == 'done'" />
+                            <label for="employee_ids" />
+                            <div class="o_row" readonly="state == 'done'">
+                                <field
+                                    name="employee_ids"
+                                    widget="many2many_avatar_user"
+                                />
+                                <button
+                                    name="select_all_employees"
+                                    type="object"
+                                    string="All employees"
+                                    class="btn-secondary"
+                                    icon="fa-users"
+                                    invisible="state == 'done'"
+                                />
+                            </div>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page id="correction_lines" string="Correction Lines">
+                            <field name="correction_lines">
+                                <tree create="0" editable="bottom">
+                                    <field name="payslip_id" readonly="True" />
+                                    <field
+                                        name="employee_id"
+                                        widget="many2one_avatar_employee"
+                                        readonly="True"
+                                    />
+                                    <field name="payslip_state" />
+                                    <field
+                                        name="holiday_correction_amount"
+                                        readonly="False"
+                                    />
+                                    <field
+                                        name="christmas_correction_amount"
+                                        readonly="False"
+                                    />
+                                    <field
+                                        name="social_charges_correction_amount"
+                                        readonly="False"
+                                    />
+                                    <button
+                                        name="reset_correction_amounts"
+                                        type="object"
+                                        string=" Reset"
+                                        class="btn-secondary"
+                                        icon="fa-refresh"
+                                    />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record
+        id="hr_allowance_provision_correction_pt_action"
+        model="ir.actions.act_window"
+    >
+        <field name="name">Allowance Provision Correction (PT)</field>
+        <field name="res_model">hr.allowance.provision.correction.pt</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="hr_allowance_provision_correction_pt_view_tree" />
+    </record>
+
+    <menuitem
+        id="menu_hr_allowance_provision_correction_pt"
+        action="hr_allowance_provision_correction_pt_action"
+        sequence="100"
+        parent="hr_payroll.menu_hr_payroll_payslips"
+        groups="hr_payroll.group_hr_payroll_user"
+    />
+</odoo>
