@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="wizard_payroll_statement_form" model="ir.ui.view">
+        <field name="name">payroll.statement.wizard.pt.form</field>
+        <field name="model">payroll.statement.wizard.pt</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="ptplus.dataport_export_form" />
+        <field name="arch" type="xml">
+            <field name="company_id" position="after">
+                <field name="export_csv_button" invisible="1" />
+                <field name="export_xls_button" invisible="1" />
+                <!--DMR fields-->
+                <field name="statement_type" />
+                <field
+                    name="first_decl_replacement_decl"
+                    invisible="statement_type != 'payroll.dmr'"
+                />
+                <field
+                    name="declaration_presented_under"
+                    invisible="statement_type != 'payroll.dmr'"
+                />
+                <field
+                    name="date_that_determined_the_obligation_to_declare"
+                    invisible="not declaration_presented_under"
+                />
+                <field
+                    name="determines_fair_impediment"
+                    invisible="statement_type != 'payroll.dmr'"
+                />
+                <field
+                    name="date_of_occurrence"
+                    invisible="not determines_fair_impediment"
+                />
+                <field
+                    name="date_of_assignment"
+                    invisible="not determines_fair_impediment"
+                />
+                <!--Holiday Sheets fields-->
+                <field
+                    name="l10n_pt_insurance"
+                    invisible="statement_type != 'payroll.holiday_sheets'"
+                />
+                <!--Annual Income Statement fields-->
+                <field
+                    name="employee_ids"
+                    invisible="statement_type not in ['payroll.income_stmt', 'payroll.annual_accumulated']"
+                    widget="many2many_tags"
+                />
+                <!--Single Report-->
+                <field
+                    name="single_report_type"
+                    invisible="statement_type != 'payroll.single_report'"
+                />
+                <field
+                    name="payslip_state"
+                    invisible="statement_type != 'payroll.aggregate_salary_statement'"
+                />
+
+            </field>
+            <button name="export_txt" position="after">
+                <button
+                    name="export_ass_xls"
+                    type="object"
+                    class="oe_highlight"
+                    string="Export XLS"
+                    invisible="export_xls_button == False"
+                />
+                <button
+                    name="export_ass_csv"
+                    type="object"
+                    class="oe_highlight"
+                    string="Export CSV"
+                    invisible="export_csv_button == False"
+                />
+            </button>
+        </field>
+    </record>
+</odoo>

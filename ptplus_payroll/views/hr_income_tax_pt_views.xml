@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="hr_income_tax_pt_view_search" model="ir.ui.view">
+        <field name="name">hr.income.tax.pt.search</field>
+        <field name="model">hr.income.tax.pt</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="base_salary" />
+                <field name="marital_status_ids" />
+                <field name="disability" />
+                <field name="region" />
+                <filter
+                    string="Date From"
+                    name="date_filter"
+                    date="date_from"
+                    default_period="month-1"
+                />
+                <group expand="1" string="Group By">
+                    <filter
+                        string="Date From"
+                        name="date_from"
+                        context="{'group_by':'date_from'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="hr_income_tax_pt_view_tree" model="ir.ui.view">
+        <field name="name">hr.income.tax.pt.list</field>
+        <field name="model">hr.income.tax.pt</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="base_salary" />
+                <field name="marital_status_ids" widget="many2many_tags" />
+                <field name="disability" />
+                <field name="region" />
+                <field name="date_from" />
+                <field name="maximum_marginal_rate" optional="hide" />
+                <field name="portion_to_be_abated" optional="hide" />
+                <field name="addi_port_to_be_abated_per_dep" optional="hide" />
+                <field
+                    name="effe_mon_with_rate_at_the_lim_of_the_brac"
+                    optional="hide"
+                />
+                <field name="dependent" optional="hide" />
+                <field name="disabilit_armed_forces" optional="hide" />
+                <field name="pensioner" optional="hide" />
+                <field name="zero_dependents" optional="hide" />
+                <field name="one_dependent" optional="hide" />
+                <field name="two_dependents" optional="hide" />
+                <field name="three_dependents" optional="hide" />
+                <field name="four_dependents" optional="hide" />
+                <field name="five_or_more_dependents" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_income_tax_view_form" model="ir.ui.view">
+        <field name="name">hr.income.tax.pt.form</field>
+        <field name="model">hr.income.tax.pt</field>
+        <field name="arch" type="xml">
+            <form string="Income Tax">
+                <sheet>
+                    <group>
+                        <field name="base_salary" />
+                        <field
+                            name="maximum_marginal_rate"
+                            invisible="date_from &lt; '2023-07-01'"
+                            widget="percentage"
+                        />
+                        <field
+                            name="portion_to_be_abated"
+                            invisible="date_from &lt; '2023-07-01'"
+                        />
+                        <field
+                            name="addi_port_to_be_abated_per_dep"
+                            invisible="date_from &lt; '2023-07-01'"
+                        />
+                        <field
+                            name="effe_mon_with_rate_at_the_lim_of_the_brac"
+                            invisible="date_from &lt; '2023-07-01'"
+                        />
+                        <field
+                            name="dependent"
+                            invisible="date_from &lt; '2023-07-01'"
+                        />
+                        <field
+                            name="disabilit_armed_forces"
+                            invisible="date_from &lt; '2023-07-01'"
+                        />
+                        <field
+                            name="pensioner"
+                            invisible="date_from &lt; '2023-07-01'"
+                        />
+                        <field name="marital_status_ids" widget="many2many_tags" />
+                        <field
+                            name="zero_dependents"
+                            invisible="date_from >= '2023-07-01'"
+                        />
+                        <field
+                            name="one_dependent"
+                            invisible="date_from >= '2023-07-01'"
+                        />
+                        <field
+                            name="two_dependents"
+                            invisible="date_from >= '2023-07-01'"
+                        />
+                        <field
+                            name="three_dependents"
+                            invisible="date_from >= '2023-07-01'"
+                        />
+                        <field
+                            name="four_dependents"
+                            invisible="date_from >= '2023-07-01'"
+                        />
+                        <field
+                            name="five_or_more_dependents"
+                            invisible="date_from >= '2023-07-01'"
+                        />
+                        <field name="disability" />
+                        <field name="region" />
+                        <field name="date_from" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_income_tax_pt_action" model="ir.actions.act_window">
+        <field name="name">Income Taxes</field>
+        <field name="res_model">hr.income.tax.pt</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="hr_income_tax_pt_view_tree" />
+        <field name="search_view_id" ref="hr_income_tax_pt_view_search" />
+    </record>
+
+    <menuitem
+        id="menu_hr_income_tax_pt_action"
+        action="hr_income_tax_pt_action"
+        sequence="1"
+    />
+</odoo>
