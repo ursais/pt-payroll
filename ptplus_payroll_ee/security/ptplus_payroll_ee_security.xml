@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="hr_salary_complement_pt_rule_multi_company" model="ir.rule">
+        <field name="name">Hr Salary Complement Pt: multi company global rule</field>
+        <field name="model_id" ref="model_hr_salary_complement_pt" />
+        <field name="global" eval="True" />
+        <field
+            name="domain_force"
+        >['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="dataport_log_payroll_rule" model="ir.rule">
+        <field name="name">Dataport Log Payroll Reports</field>
+        <field name="model_id" ref="ptplus.model_dataport_log" />
+        <field name="groups" eval="[(4, ref('hr_payroll.group_hr_payroll_user'))]" />
+        <field name="domain_force">
+            [('type', 'ilike', 'payroll%')]
+        </field>
+        <field name="perm_create" eval="False" />
+        <field name="perm_write" eval="False" />
+        <field name="perm_unlink" eval="False" />
+    </record>
+
+    <record id="hr_allowance_provision_correction_multi_company" model="ir.rule">
+        <field name="name">HR Allowance Provision Correction: Multi Company</field>
+        <field name="model_id" ref="model_hr_allowance_provision_correction_pt" />
+        <field
+            name="domain_force"
+        >['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="perm_unlink" eval="False" />
+    </record>
+
+</odoo>

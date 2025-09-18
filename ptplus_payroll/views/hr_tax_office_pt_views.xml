@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="hr_tax_office_pt_action" model="ir.actions.act_window">
+        <field name="name">Tax Office</field>
+        <field name="res_model">hr.tax.office.pt</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="ptplus_partner.hr_tax_office_pt_view_tree" />
+        <field
+            name="search_view_id"
+            ref="ptplus_partner.hr_tax_office_pt_view_search"
+        />
+    </record>
+
+    <menuitem
+        id="menu_hr_tax_office_pt_action"
+        action="hr_tax_office_pt_action"
+        sequence="6"
+    />
+</odoo>

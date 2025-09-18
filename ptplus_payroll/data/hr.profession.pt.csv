@@ -1,0 +1,654 @@
+id,name,code
+hr_profession_11110,Representantes do poder legislativo e de órgãos executivos,11110
+hr_profession_11120,Dirigente superior da Administração Pública,11120
+hr_profession_11130,Chefe tradicional e chefe de aldeia,11130
+hr_profession_11140,Dirigente de organizações de interesse especial,11140
+hr_profession_11200,"Director geral e gestor executivo, de empresas ",11200
+hr_profession_12110,Director financeiro,12110
+hr_profession_12120,Director de recursos humanos,12120
+hr_profession_12130,Directores de estratégia e planeamento,12130
+hr_profession_12190,Outros directores de serviços de negócios e de administração,12190
+hr_profession_12211,Director de vendas,12211
+hr_profession_12212,Director de marketing,12212
+hr_profession_12221,Director de publicidade,12221
+hr_profession_12222,Director de relações públicas,12222
+hr_profession_12230,Directores de investigação e desenvolvimento,12230
+hr_profession_13111,Director de produção na agricultura,13111
+hr_profession_13112,Director de produção animal,13112
+hr_profession_13113,Director de produção florestal,13113
+hr_profession_13121,Director de produção na pesca,13121
+hr_profession_13122,Director de produção na aquicultura,13122
+hr_profession_13210,Director das indústrias transformadoras,13210
+hr_profession_13220,Director das indústrias extractivas,13220
+hr_profession_13230,Director das indústrias de construção e de engenharia civil,13230
+hr_profession_13241,Director de compras,13241
+hr_profession_13242,Director de transportes,13242
+hr_profession_13243,"Directores de armazenagem, distribuição e relacionados",13243
+hr_profession_13300,Directores dos serviços das tecnologias da informação e comunicação (TIC),13300
+hr_profession_13410,Director dos serviços de cuidados de crianças,13410
+hr_profession_13420,Director dos serviços de saúde,13420
+hr_profession_13430,Director dos serviços de cuidados a pessoas idosas,13430
+hr_profession_13440,Director dos serviços de apoio social,13440
+hr_profession_13450,Director dos serviços de educação,13450
+hr_profession_13460,"Director de sucursais de bancos, serviços financeiros e de seguros",13460
+hr_profession_13491,"Director de bibliotecas, arquivos, museus, galerias de arte e monumentos nacionais ",13491
+hr_profession_13492,"Oficiais e outros profissionais, das forças e serviços de segurança, com funções de comando, direcção ou chefia ",13492
+hr_profession_13493,"Director de outros serviços especializados, n.e.",13493
+hr_profession_14110,"Director e gerente, de hotéis e similares",14110
+hr_profession_14120,Director e gerente de restauração (restaurantes e similares),14120
+hr_profession_14201,Director e gerente do comércio a retalho,14201
+hr_profession_14202,Director e gerente do comércio por grosso,14202
+hr_profession_14310,"Director e gerente dos centros desportivos, recreativos e culturais",14310
+hr_profession_14390,"Director e gerente de outros serviços, n.e. ",14390
+hr_profession_21111,Físico,21111
+hr_profession_21112,Astrónomo,21112
+hr_profession_21120,Meteorologista,21120
+hr_profession_21130,Químico,21130
+hr_profession_21141,Geólogo,21141
+hr_profession_21142,Geofísico,21142
+hr_profession_21143,Oceanógrafo,21143
+hr_profession_21201,Matemático,21201
+hr_profession_21202,Actuário,21202
+hr_profession_21203,Estaticista e demógrafo,21203
+hr_profession_21311,Biólogo,21311
+hr_profession_21312,Botânico,21312
+hr_profession_21313,Zoólogo,21313
+hr_profession_21314,Farmacologista e outros especialistas relacionados,21314
+hr_profession_21321,Engenheiro agrónomo,21321
+hr_profession_21322,Engenheiro florestal,21322
+hr_profession_21323,Consultor de actividades das pescas,21323
+hr_profession_21330,Especialista da protecção do ambiente,21330
+hr_profession_21410,Engenheiro industrial e de produção,21410
+hr_profession_21421,Engenheiro de construção de edifícios,21421
+hr_profession_21422,Engenheiro de obras de engenharia civil,21422
+hr_profession_21430,Engenheiro do ambiente,21430
+hr_profession_21440,Engenheiro mecânico,21440
+hr_profession_21450,Engenheiro químico,21450
+hr_profession_21461,Engenheiro de minas,21461
+hr_profession_21462,Engenheiro metalúrgico,21462
+hr_profession_21463,Outros engenheiros relacionados com minas e metalurgia,21463
+hr_profession_21490,Outros especialistas em engenharia (excepto electrotecnologia),21490
+hr_profession_21510,Engenheiro electrotécnico,21510
+hr_profession_21520,Engenheiro electrónico,21520
+hr_profession_21530,Engenheiro de telecomunicações,21530
+hr_profession_21610,Arquitecto de edifícios,21610
+hr_profession_21620,Arquitecto paisagista,21620
+hr_profession_21631,Designer de produto industrial ou de equipamento,21631
+hr_profession_21632,Designer de têxteis e moda,21632
+hr_profession_21633,"Designer de interiores, espaços ou de ambientes",21633
+hr_profession_21640,Urbanista de cidade e tráfego,21640
+hr_profession_21651,Cartógrafo e agrimensor,21651
+hr_profession_21652,Topógrafo e similares,21652
+hr_profession_21660,"Designer, gráfico ou de comunicação e multimédia",21660
+hr_profession_22111,Médico de medicina geral e familiar,22111
+hr_profession_22112,Outros médicos generalistas,22112
+hr_profession_22121,Médico de especialidades cirúrgicas,22121
+hr_profession_22122,Médico de especialidades médicas,22122
+hr_profession_22123,Médico de especialidades técnicas,22123
+hr_profession_22211,Enfermeiro de cuidados gerais,22211
+hr_profession_22212,Enfermeiro especialista em reabilitação,22212
+hr_profession_22213,Enfermeiro especialista em saúde infantil e pediátrica,22213
+hr_profession_22214,Enfermeiro especialista em saúde mental e psiquiátrica,22214
+hr_profession_22215,Enfermeiro especialista em enfermagem comunitária,22215
+hr_profession_22216,Enfermeiro especialista em enfermagem médico-cirúrgica,22216
+hr_profession_22217,Outros enfermeiros especialistas (excepto em saúde materna e obstétrica),22217
+hr_profession_22220,Enfermeiro especialista em saúde materna e obstétrica,22220
+hr_profession_22301,Acupunctor,22301
+hr_profession_22302,Homeopata,22302
+hr_profession_22303,Outros especialistas em medicina tradicional e alternativa,22303
+hr_profession_22400,Profissional paramédico,22400
+hr_profession_22500,Veterinário,22500
+hr_profession_22611,Médico estomatologista,22611
+hr_profession_22612,Médico dentista,22612
+hr_profession_22620,Farmacêutico,22620
+hr_profession_22630,"Especialista em higiene e saúde, ambiental e laboral",22630
+hr_profession_22640,Fisioterapeuta,22640
+hr_profession_22650,Dietista e nutricionista,22650
+hr_profession_22661,Audiologista,22661
+hr_profession_22662,Terapeuta da fala,22662
+hr_profession_22670,Optometrista e óptico oftálmico,22670
+hr_profession_22691,Terapeuta ocupacional,22691
+hr_profession_22692,"Outros profissionais da saúde diversos, n.e. ",22692
+hr_profession_23100,Professor dos ensinos universitário e superior,23100
+hr_profession_23200,"Professor dos ensinos, tecnológico, artístico e profissional",23200
+hr_profession_23300,Professor dos ensinos básico (2º e 3º ciclos) e secundário,23300
+hr_profession_23410,Professor do ensino básico (1º ciclo),23410
+hr_profession_23420,Educador de infância,23420
+hr_profession_23510,Especialista em métodos de ensino,23510
+hr_profession_23520,Professor do ensino especial,23520
+hr_profession_23530,Outros professores de línguas,23530
+hr_profession_23540,Outros professores de música,23540
+hr_profession_23550,Outros professores de arte,23550
+hr_profession_23560,Formador em tecnologias de informação,23560
+hr_profession_23590,"Outros especialistas do ensino, n.e. ",23590
+hr_profession_24110,"Contabilista, auditor, revisor oficial de contas e similares ",24110
+hr_profession_24120,Consultor financeiro e de investimentos,24120
+hr_profession_24130,Analista financeiro,24130
+hr_profession_24210,Analista em gestão e organização,24210
+hr_profession_24220,Especialista em políticas da administração,24220
+hr_profession_24230,Especialista em recursos humanos,24230
+hr_profession_24240,Especialista em formação e desenvolvimento de recursos humanos,24240
+hr_profession_24310,Especialista em publicidade e marketing,24310
+hr_profession_24320,Especialista em relações públicas,24320
+hr_profession_24331,Delegado de informação médica,24331
+hr_profession_24332,Outros especialistas em venda de material técnico e médico (excepto TIC),24332
+hr_profession_24340,Especialista em vendas de tecnologias de informação e comunicação (TIC),24340
+hr_profession_25110,Analista de sistemas,25110
+hr_profession_25120,Programador de software,25120
+hr_profession_25130,Programador Web e de multimédia,25130
+hr_profession_25140,Programador de aplicações,25140
+hr_profession_25190,"Outros analistas e programadores, de software e aplicações",25190
+hr_profession_25210,Administrador e especialista de concepção de base de dados,25210
+hr_profession_25220,Administrador de sistemas,25220
+hr_profession_25230,Especialista de redes informáticas,25230
+hr_profession_25290,Outros especialistas em base de dados e redes,25290
+hr_profession_26111,Advogado,26111
+hr_profession_26112,Solicitador,26112
+hr_profession_26120,Magistrado (Judicial e do Ministério Público),26120
+hr_profession_26191,"Conservador dos registos civil, automóvel, comercial e predial ",26191
+hr_profession_26192,Notário,26192
+hr_profession_26193,"Outros especialistas em assuntos jurídicos, n.e.",26193
+hr_profession_26211,Arquivista,26211
+hr_profession_26212,Curador de museus,26212
+hr_profession_26220,Bibliotecários e outros especialistas de informação relacionados,26220
+hr_profession_26310,Economista,26310
+hr_profession_26321,Sociólogo,26321
+hr_profession_26322,Geógrafo,26322
+hr_profession_26323,Arqueólogo,26323
+hr_profession_26324,Antropólogo e similares,26324
+hr_profession_26331,Filósofo,26331
+hr_profession_26332,Historiador,26332
+hr_profession_26333,Especialista em ciências políticas,26333
+hr_profession_26340,Psicólogo,26340
+hr_profession_26350,Especialista do trabalho social,26350
+hr_profession_26360,Ministro de culto,26360
+hr_profession_26410,Autor e escritor,26410
+hr_profession_26420,Jornalista,26420
+hr_profession_26431,Filólogo,26431
+hr_profession_26432,Tradutor,26432
+hr_profession_26433,Intérprete e outros linguistas,26433
+hr_profession_26511,Escultor,26511
+hr_profession_26512,Pintor de arte,26512
+hr_profession_26513,Caricaturista,26513
+hr_profession_26514,Outros artistas de artes visuais,26514
+hr_profession_26521,Compositor,26521
+hr_profession_26522,Músico,26522
+hr_profession_26523,Cantor,26523
+hr_profession_26531,Bailarino,26531
+hr_profession_26532,Coreógrafo,26532
+hr_profession_26541,Realizador de cinema e teatro,26541
+hr_profession_26542,Encenador de teatro,26542
+hr_profession_26543,Produtor de cinema e teatro,26543
+hr_profession_26544,"Produtor e realizador, de televisão e rádio",26544
+hr_profession_26545,"Director de fotografia e de som, montador e relacionados",26545
+hr_profession_26550,Actor,26550
+hr_profession_26560,"Locutor e apresentador, de rádio, de televisão e de outros meios de comunicação",26560
+hr_profession_26591,Disc jockey,26591
+hr_profession_26592,"Outros artistas e intérpretes criativos das artes do espectáculo, n.e.",26592
+hr_profession_31111,Técnico das ciências físicas,31111
+hr_profession_31112,Técnico das ciências químicas,31112
+hr_profession_31120,Técnico de engenharia civil,31120
+hr_profession_31130,Técnico de electricidade,31130
+hr_profession_31140,Técnico de electrónica,31140
+hr_profession_31151,Técnico de inspecção de veículos,31151
+hr_profession_31152,Outros técnicos e inspectores de mecânica,31152
+hr_profession_31160,Técnico de química industrial,31160
+hr_profession_31170,Técnico da metalurgia de base e da indústria extractiva,31170
+hr_profession_31180,Desenhadores e técnicos afins,31180
+hr_profession_31191,Técnico de gás,31191
+hr_profession_31192,"Outros técnicos das ciências físicas e de engenharia, n.e.",31192
+hr_profession_31210,Encarregado da indústria extractiva,31210
+hr_profession_31221,Encarregados das indústrias alimentares e das bebidas,31221
+hr_profession_31222,"Encarregados das indústrias têxteis, do vestuário, calçado e curtumes",31222
+hr_profession_31223,Encarregados das indústrias da madeira e cortiça,31223
+hr_profession_31224,"Encarregados das indústrias da pasta, papel, impressão e similares",31224
+hr_profession_31225,"Encarregados das indústrias da refinação do petróleo, químicas, produtos farmacêuticos e transformação de matérias plásticas e borracha",31225
+hr_profession_31226,Encarregados das indústrias da transformação de minerais não metálicos,31226
+hr_profession_31227,Encarregados das indústrias metalúrgicas de base e fabrico de produtos metálicos,31227
+hr_profession_31228,Outros encarregados da indústria transformadora,31228
+hr_profession_31230,Encarregado da construção,31230
+hr_profession_31310,Técnico de operação de instalações de produção de energia,31310
+hr_profession_31321,Técnico de operação de incineradores,31321
+hr_profession_31322,Técnico de operação de instalações de tratamento de água,31322
+hr_profession_31330,Técnico de controlo de instalações da indústria química,31330
+hr_profession_31340,Técnico de operação de instalações de refinação de petróleo e gás natural,31340
+hr_profession_31350,Técnico de controlo de instalações de produção de metais,31350
+hr_profession_31390,Outros técnicos de controlo de processos industriais,31390
+hr_profession_31410,Técnico das ciências da vida (excepto ciências médicas),31410
+hr_profession_31421,Técnico agrícola,31421
+hr_profession_31422,Técnico da produção animal,31422
+hr_profession_31430,Técnico florestal (inclui cinegético),31430
+hr_profession_31510,Oficial maquinista de navios,31510
+hr_profession_31520,Oficial de convés e piloto de navios,31520
+hr_profession_31530,Piloto de aeronaves,31530
+hr_profession_31540,Controlador de tráfego aéreo,31540
+hr_profession_31550,Técnico de segurança de sistemas electrónicos aeronáuticos,31550
+hr_profession_32111,Técnico de cardiopneumografia,32111
+hr_profession_32112,Técnico de radiologia,32112
+hr_profession_32113,Técnico de medicina nuclear,32113
+hr_profession_32114,Técnico de radioterapia,32114
+hr_profession_32115,Outros técnicos de equipamento de diagnóstico e terapêutico,32115
+hr_profession_32121,Técnico de análises clínicas,32121
+hr_profession_32122,"Técnico de anatomia patológica, citológica e tanatológica",32122
+hr_profession_32130,Técnicos e assistentes farmacêuticos,32130
+hr_profession_32140,Técnico de próteses médicas e dentárias,32140
+hr_profession_32210,Auxiliar de enfermagem,32210
+hr_profession_32220,Parteira,32220
+hr_profession_32300,Profissionais de nível intermédio da medicina tradicional e complementar,32300
+hr_profession_32400,Técnico e assistente de veterinários,32400
+hr_profession_32510,Terapeuta e assistente dentário,32510
+hr_profession_32520,Técnico de registos médicos e de informação sobre saúde,32520
+hr_profession_32530,Técnico dos serviços de saúde comunitária,32530
+hr_profession_32541,Técnico de óptica ocular,32541
+hr_profession_32542,Técnico de contactologia,32542
+hr_profession_32550,"Técnico e assistente, de fisioterapia e similares",32550
+hr_profession_32560,Assistente de médicos,32560
+hr_profession_32570,"Inspectores e técnicos, da saúde, do trabalho e ambiente",32570
+hr_profession_32580,Pessoal de ambulâncias,32580
+hr_profession_32590,"Outros profissionais de nível intermédio da saúde, n.e.",32590
+hr_profession_33110,"Corretor de bolsa, cambista e similares",33110
+hr_profession_33120,Agentes de crédito e empréstimos,33120
+hr_profession_33131,Tesoureiro,33131
+hr_profession_33132,Outros técnicos administrativos de contabilidade,33132
+hr_profession_33140,"Técnicos de nível intermédio, de estatística, matemática e similares",33140
+hr_profession_33150,"Avaliador de imóveis, seguros e outros bens  ",33150
+hr_profession_33210,Agente de seguros,33210
+hr_profession_33220,Representante comercial,33220
+hr_profession_33230,Técnico de compras,33230
+hr_profession_33240,Corretor comercial,33240
+hr_profession_33310,"Despachante, transitário e similares",33310
+hr_profession_33320,Organizador de conferências e eventos,33320
+hr_profession_33330,Técnico da área do emprego,33330
+hr_profession_33340,Agente imobiliário e gestor de propriedades,33340
+hr_profession_33390,Outros agentes de negócios,33390
+hr_profession_33411,Chefe de escritório,33411
+hr_profession_33412,Encarregado de armazém,33412
+hr_profession_33413,Chefe de estação de correios,33413
+hr_profession_33414,Fiscal e encarregado de portagem,33414
+hr_profession_33415,Supervisor de cargas e descargas,33415
+hr_profession_33416,Outros supervisores de pessoal administrativo,33416
+hr_profession_33420,Secretário da área jurídica,33420
+hr_profession_33430,Secretário administrativo e executivo,33430
+hr_profession_33440,Secretário da área da medicina,33440
+hr_profession_33510,Inspector de alfândega e de fronteira,33510
+hr_profession_33520,Agente da administração tributária,33520
+hr_profession_33530,Agente de serviços da segurança social,33530
+hr_profession_33540,Agente de serviços de licenciamento,33540
+hr_profession_33550,Inspector e detective da polícia,33550
+hr_profession_33590,"Outros agentes de nível intermédio da Administração Pública, para aplicação da lei e similares",33590
+hr_profession_34110,Técnico de nível intermédio dos serviços jurídicos e relacionados,34110
+hr_profession_34120,Técnico de nível intermédio de apoio social,34120
+hr_profession_34130,Membro de ordem religiosa e técnicos de apoio religioso,34130
+hr_profession_34211,Jogador profissional de futebol,34211
+hr_profession_34212,Ciclista profissional,34212
+hr_profession_34213,Outros atletas e desportistas de competição,34213
+hr_profession_34221,Treinador de desportos,34221
+hr_profession_34222,Árbitro (juiz) de desportos,34222
+hr_profession_34223,Instrutor de desportos,34223
+hr_profession_34230,Instrutores e monitores de actividade física e recreação,34230
+hr_profession_34310,Fotógrafo,34310
+hr_profession_34320,Decorador,34320
+hr_profession_34330,"Técnicos de galerias, bibliotecas, arquivos e museus",34330
+hr_profession_34340,Chefe de cozinha,34340
+hr_profession_34351,"Toureiro, cavaleiro tauromáquico e outros profissionais similares",34351
+hr_profession_34352,"Outros técnicos de nível intermédio das actividades culturais e artísticas, n.e.",34352
+hr_profession_35110,Técnico operador das tecnologias de informação e comunicação (TIC),35110
+hr_profession_35120,Técnico de apoio aos utilizadores das tecnologias da informação e comunicação (TIC),35120
+hr_profession_35130,Técnico em redes e sistemas de computadores,35130
+hr_profession_35140,Técnico da Web,35140
+hr_profession_35211,Técnico de emissões de rádio,35211
+hr_profession_35212,Técnico de emissões de televisão,35212
+hr_profession_35213,Técnico de gravação audiovisual,35213
+hr_profession_35214,Técnico de sistemas de comunicações via rádio,35214
+hr_profession_35220,Técnico de telecomunicações,35220
+hr_profession_41100,Empregado de escritório em geral,41100
+hr_profession_41200,Técnico de secretariado,41200
+hr_profession_41310,Dactilógrafo e operador de processamento de texto,41310
+hr_profession_41320,Operador de registo de dados,41320
+hr_profession_42110,Caixa bancário e similar,42110
+hr_profession_42120,Empregado de banca nos casinos e outros empregados de apostas,42120
+hr_profession_42130,Penhorista e prestamista,42130
+hr_profession_42140,Cobrador de facturas e similares,42140
+hr_profession_42210,Empregado das agências de viagens,42210
+hr_profession_42220,Empregado dos centros de chamadas,42220
+hr_profession_42230,Operador de central telefónica,42230
+hr_profession_42240,Recepcionista de hotel,42240
+hr_profession_42250,Pessoal de informação administrativa,42250
+hr_profession_42260,"Recepcionista, excepto de hotel ",42260
+hr_profession_42270,Entrevistador de inquéritos e de estudos de mercado,42270
+hr_profession_42290,Outro pessoal de recepção e de informação a clientes,42290
+hr_profession_43110,Operador de contabilidade e escrituração comercial,43110
+hr_profession_43120,"Operador dos serviços de estatística, financeiros e seguros",43120
+hr_profession_43130,Operador de dados de processamento de pagamentos,43130
+hr_profession_43211,Empregado de aprovisionamento,43211
+hr_profession_43212,Empregado de armazém,43212
+hr_profession_43220,Empregado de serviços de apoio à produção,43220
+hr_profession_43231,Controlador de transportes terrestres de passageiros,43231
+hr_profession_43232,Controlador de transportes terrestres de mercadorias,43232
+hr_profession_43233,Empregado de controlo dos serviços de transportes aéreos e marítimos,43233
+hr_profession_44110,Empregado de biblioteca,44110
+hr_profession_44120,Carteiro e similares,44120
+hr_profession_44130,"Codificador, revisor de provas e similares",44130
+hr_profession_44140,Escrivão e similares,44140
+hr_profession_44150,Classificador arquivista,44150
+hr_profession_44160,Empregado de serviço de pessoal,44160
+hr_profession_44190,"Outro pessoal de apoio de tipo administrativo, n.e. ",44190
+hr_profession_51110,Assistentes de viagem e comissários,51110
+hr_profession_51120,Fiscal e cobrador de transportes públicos,51120
+hr_profession_51130,Guia intérprete,51130
+hr_profession_51200,Cozinheiro,51200
+hr_profession_51310,Empregado de mesa,51310
+hr_profession_51320,Empregado de bar,51320
+hr_profession_51410,Cabeleireiro e barbeiro,51410
+hr_profession_51421,Esteticista,51421
+hr_profession_51422,Massagista de estética,51422
+hr_profession_51423,"Manicura, pedicura e calista",51423
+hr_profession_51424,Outros trabalhadores similares aos esteticistas,51424
+hr_profession_51510,"Encarregado de limpeza e de trabalhos domésticos em escritórios, hotéis e outros estabelecimentos",51510
+hr_profession_51520,Governante doméstico,51520
+hr_profession_51530,Porteiro de edifícios,51530
+hr_profession_51611,Astrólogo,51611
+hr_profession_51612,Adivinhador e similares,51612
+hr_profession_51620,Pessoal de companhia e ajudantes de quarto,51620
+hr_profession_51631,Agente funerário,51631
+hr_profession_51632,Embalsamador,51632
+hr_profession_51640,Prestador de cuidados a animais,51640
+hr_profession_51650,Instrutor de condução,51650
+hr_profession_51690,"Outros trabalhadores dos serviços pessoais, n.e.",51690
+hr_profession_52110,Vendedor em quiosque e em mercados,52110
+hr_profession_52120,Vendedor ambulante de produtos alimentares,52120
+hr_profession_52210,Comerciante de loja (estabelecimento),52210
+hr_profession_52220,Encarregado de loja (estabelecimento),52220
+hr_profession_52230,Vendedor em loja (estabelecimento),52230
+hr_profession_52301,Operador de caixa,52301
+hr_profession_52302,Bilheteiro,52302
+hr_profession_52410,Manequim e outros modelos,52410
+hr_profession_52420,Demonstrador,52420
+hr_profession_52430,Vendedor ao domicílio,52430
+hr_profession_52440,Vendedor de centros de contacto,52440
+hr_profession_52450,Assistente de estação de serviço ao condutor,52450
+hr_profession_52460,Assistente de venda de alimentos ao balcão,52460
+hr_profession_52490,"Outros trabalhadores relacionados com vendas, n.e. ",52490
+hr_profession_53110,Auxiliar de cuidados de crianças,53110
+hr_profession_53120,Auxiliar de professor,53120
+hr_profession_53210,Auxiliar de saúde,53210
+hr_profession_53220,Ajudante familiar,53220
+hr_profession_53290,Outros trabalhadores dos cuidados pessoais e similares nos serviços de saúde,53290
+hr_profession_54110,Bombeiro,54110
+hr_profession_54121,Sargentos da Guarda Nacional Republicana,54121
+hr_profession_54122,Guardas da Guarda Nacional Republicana,54122
+hr_profession_54123,Agente de Polícia de Segurança Pública,54123
+hr_profession_54124,Agente de Polícia Marítima,54124
+hr_profession_54125,Agente de Polícia Municipal,54125
+hr_profession_54126,Outros agentes de polícia,54126
+hr_profession_54130,Guarda dos serviços prisionais,54130
+hr_profession_54141,Porteiro de hotelaria,54141
+hr_profession_54142,"Segurança (vigilante privado), outros porteiros e similares",54142
+hr_profession_54190,Outro pessoal dos serviços de protecção e segurança,54190
+hr_profession_61110,Agricultor e trabalhador qualificado de cereais e outras culturas extensivas,61110
+hr_profession_61120,Agricultor e trabalhador qualificado de culturas de árvores e arbustos,61120
+hr_profession_61131,Agricultor e trabalhador qualificado da horticultura,61131
+hr_profession_61132,Floricultor,61132
+hr_profession_61133,Viveirista,61133
+hr_profession_61134,Trabalhador qualificado da jardinagem,61134
+hr_profession_61140,Agricultor e trabalhador qualificado de culturas agrícolas mistas,61140
+hr_profession_61211,Produtor e trabalhador qualificado na produção de bovinos,61211
+hr_profession_61212,Produtor e trabalhador qualificado na produção de ovinos e caprinos,61212
+hr_profession_61213,Produtor e trabalhador qualificado na produção de suinos,61213
+hr_profession_61214,Produtor e trabalhador qualificado na produção de outros animais de carne,61214
+hr_profession_61220,Avicultor e trabalhador qualificado da avicultura,61220
+hr_profession_61231,Apicultor e trabalhador qualificado da apicultura,61231
+hr_profession_61232,Sericicultor e trabalhador qualificado da sericicultura,61232
+hr_profession_61290,Outros produtores e trabalhadores qualificados da criação animal,61290
+hr_profession_61300,"Agricultor e trabalhador qualificado da agricultura e produção animal combinadas, orientados para o mercado ",61300
+hr_profession_62101,Motosserrista,62101
+hr_profession_62102,Sapador florestal,62102
+hr_profession_62103,Outros trabalhadores qualificados da floresta e similares,62103
+hr_profession_62211,Aquicultor (aquacultor) e trabalhador qualificado de aquicultura de águas interiores,62211
+hr_profession_62212,Aquicultor (aquacultor) e trabalhador qualificado de aquicultura de águas marítimas,62212
+hr_profession_62221,Pescador de águas interiores,62221
+hr_profession_62222,"Mestre, contramestre e arrais, de pesca marítima costeira",62222
+hr_profession_62223,"Pescador e marinheiro pescador, de pesca marítima costeira ",62223
+hr_profession_62224,Outros trabalhadores qualificados de pesca de águas interiores,62224
+hr_profession_62225,Outros trabalhadores qualificados de pesca marítima costeira,62225
+hr_profession_62231,"Mestre, contramestre e arrais, de pesca marítima do largo",62231
+hr_profession_62232,"Pescador e marinheiro pescador, de pesca marítima do largo",62232
+hr_profession_62233,Outros trabalhadores qualificados da pesca marítima do largo,62233
+hr_profession_62240,Caçador qualificado (inclui com armadilhas) orientado para o mercado,62240
+hr_profession_63100,Agricultor de subsistência,63100
+hr_profession_63200,Criador de animais de subsistência,63200
+hr_profession_63300,"Agricultor e criador de animais de produção combinada, de subsistência ",63300
+hr_profession_63400,"Pescador, caçador e colector, de subsistência",63400
+hr_profession_71110,Construtor de casas rudimentares,71110
+hr_profession_71121,Pedreiro,71121
+hr_profession_71122,Calceteiro,71122
+hr_profession_71123,Assentador de refractários,71123
+hr_profession_71131,Polidor de pedra,71131
+hr_profession_71132,Canteiro,71132
+hr_profession_71133,Outros trabalhadores qualificados da pedra e similares,71133
+hr_profession_71141,Cimenteiro,71141
+hr_profession_71142,Armador de ferro,71142
+hr_profession_71143,Montador de alvenarias e de pré-esforçados,71143
+hr_profession_71144,Outros trabalhadores qualificados em betão armado e similares,71144
+hr_profession_71151,Carpinteiro de limpos e de tosco,71151
+hr_profession_71152,Carpinteiro naval,71152
+hr_profession_71153,Outros carpinteiros e similares,71153
+hr_profession_71191,Montador de andaimes,71191
+hr_profession_71192,Espalhador de betuminosos,71192
+hr_profession_71193,"Outros trabalhadores qualificados da construção de estruturas básicas e similares, n.e.",71193
+hr_profession_71210,Colocador de telhados e de coberturas,71210
+hr_profession_71221,Assentador de tacos e afagador de madeira,71221
+hr_profession_71222,Ladrilhador,71222
+hr_profession_71223,Outros assentadores de revestimentos,71223
+hr_profession_71230,Estucador,71230
+hr_profession_71240,Trabalhador qualificado em isolamentos acústicos e térmicos,71240
+hr_profession_71250,Vidraceiro,71250
+hr_profession_71261,Canalizador,71261
+hr_profession_71262,Montador de tubagens,71262
+hr_profession_71270,Instalador de ar condicionado e de sistemas de refrigeração,71270
+hr_profession_71311,Pintor de construções,71311
+hr_profession_71312,"Colocador de papel de parede, pintor decorador e similares ",71312
+hr_profession_71321,Pintor à pistola de superfícies,71321
+hr_profession_71322,Envernizador,71322
+hr_profession_71331,Limpador de fachadas,71331
+hr_profession_71332,Limpador de chaminés e de outras estruturas de edifícios,71332
+hr_profession_72110,Operador de fundição,72110
+hr_profession_72121,Soldador,72121
+hr_profession_72122,Trabalhador de corte a oxi-gás,72122
+hr_profession_72131,Bate-chapa de veículos automóveis,72131
+hr_profession_72132,Funileiro e caldeireiro,72132
+hr_profession_72141,Serralheiro civil,72141
+hr_profession_72142,Outro preparador e montador de estruturas metálicas,72142
+hr_profession_72150,Armador e montador de cabos metálicos,72150
+hr_profession_72211,Forjador e ferreiro,72211
+hr_profession_72212,"Operador de prensa de forjar, estampador e similares ",72212
+hr_profession_72220,"Serralheiro de moldes, cunhos, cortantes e similares ",72220
+hr_profession_72231,Regulador e operador de máquinas-ferramentas convencionais para trabalhar metais,72231
+hr_profession_72232,Regulador e operador de máquinas-ferramentas de comando numérico computorizado para trabalhar metais,72232
+hr_profession_72240,"Rectificador de rodas, polidor e afiador de metais ",72240
+hr_profession_72310,Mecânico e reparador de veículos automóveis,72310
+hr_profession_72320,Técnico de manutenção e reparação de motores de avião,72320
+hr_profession_72330,"Mecânico e reparador, de máquinas agrícolas e industriais ",72330
+hr_profession_72340,Reparador de bicicletas e similares,72340
+hr_profession_73110,Trabalhador qualificado do fabrico e reparação de instrumentos de precisão,73110
+hr_profession_73120,Trabalhador qualificado do fabrico e afinação de instrumentos musicais,73120
+hr_profession_73131,Joalheiro,73131
+hr_profession_73132,Filigranista,73132
+hr_profession_73133,Outros ourives e trabalhadores de diamantes industriais,73133
+hr_profession_73141,Oleiro,73141
+hr_profession_73142,"Modelador e formista, de cerâmica ",73142
+hr_profession_73143,Outros oleiros e similares,73143
+hr_profession_73151,Soprador de artigos de vidro,73151
+hr_profession_73152,Cortador de vidro,73152
+hr_profession_73153,Polidor e acabador de artigos de vidro,73153
+hr_profession_73161,"Lapidador e gravador, de vidro, cerâmica e outros materiais",73161
+hr_profession_73162,"Pintor-decorador de vidro, cerâmica e outros materiais",73162
+hr_profession_73171,Artesão de artigos em madeira,73171
+hr_profession_73172,Artesão de cestaria e artigos similares,73172
+hr_profession_73181,"Artesão de rendas, bordados e tapeçarias, manuais ",73181
+hr_profession_73182,Artesão de artigos de couro,73182
+hr_profession_73183,"Outros trabalhadores manuais de artigos têxteis, couro e materiais similares",73183
+hr_profession_73190,"Outros trabalhadores qualificados do fabrico de instrumentos de precisão, artesãos e similares",73190
+hr_profession_73210,Operador de pré-impressão,73210
+hr_profession_73221,Serígrafo e similar,73221
+hr_profession_73222,Outros operadores de impressão,73222
+hr_profession_73231,Encadernador,73231
+hr_profession_73232,Outros trabalhadores relacionados com o acabamento da impressão,73232
+hr_profession_74110,Electricista de construções e similares,74110
+hr_profession_74121,Instalador de sistemas solares térmicos,74121
+hr_profession_74122,Instalador de sistemas solares fotovoltaicos,74122
+hr_profession_74123,Instalador de sistemas de bioenergia,74123
+hr_profession_74124,"Electromecânico, electricista e outros instaladores de máquinas e equipamentos eléctricos ",74124
+hr_profession_74130,Instalador e reparador de linhas eléctricas,74130
+hr_profession_74210,Mecânico e reparador de equipamentos electrónicos,74210
+hr_profession_74220,"Instalador e reparador, de tecnologias de informação e comunicação  ",74220
+hr_profession_75111,Matador de animais,75111
+hr_profession_75112,Cortador de carne,75112
+hr_profession_75113,Salsicheiro,75113
+hr_profession_75114,Preparador e conservador de peixe,75114
+hr_profession_75115,"Outros preparadores de carne, peixe e similares",75115
+hr_profession_75121,Padeiro,75121
+hr_profession_75122,Pasteleiro,75122
+hr_profession_75123,Confeiteiro,75123
+hr_profession_75130,Trabalhador do fabrico de produtos lácteos,75130
+hr_profession_75140,"Conserveiro de frutas, legumes e similares",75140
+hr_profession_75150,"Provadores e classificadores, de alimentos e bebidas",75150
+hr_profession_75160,"Preparador e transformador, de tabaco e seus produtos ",75160
+hr_profession_75211,Trabalhador do tratamento da madeira,75211
+hr_profession_75212,Trabalhador do tratamento da cortiça,75212
+hr_profession_75221,Marceneiro,75221
+hr_profession_75222,"Tanoeiro, embutidor e outros similares a marceneiro ",75222
+hr_profession_75231,Operador de máquinas e de equipamentos para trabalhar madeira,75231
+hr_profession_75232,Operador de máquinas e de equipamentos para trabalhar  cortiça,75232
+hr_profession_75311,Alfaiate e costureiro,75311
+hr_profession_75312,Peleiro,75312
+hr_profession_75313,Chapeleiro,75313
+hr_profession_75321,Riscador de moldes e cortador de tecidos,75321
+hr_profession_75322,"Riscador de moldes e cortador, de couros e similares",75322
+hr_profession_75331,Bordador,75331
+hr_profession_75332,Trabalhador de costura e similares,75332
+hr_profession_75341,Estofador,75341
+hr_profession_75342,Colchoeiro,75342
+hr_profession_75343,Outros trabalhadores similares a estofador,75343
+hr_profession_75351,Curtidor de peles,75351
+hr_profession_75352,Preparador e acabador de peles,75352
+hr_profession_75361,Sapateiro,75361
+hr_profession_75362,Maleiro,75362
+hr_profession_75363,Correeiro,75363
+hr_profession_75364,Albardeiro e similares,75364
+hr_profession_75410,Mergulhador,75410
+hr_profession_75420,Carregador de fogo e dinamitador,75420
+hr_profession_75430,Calibrador e verificador de produtos (excepto alimentos e bebidas),75430
+hr_profession_75440,"Fumigador e outros controladores, de pragas e ervas daninhas",75440
+hr_profession_75491,Trabalhador de vidro de óptica,75491
+hr_profession_75492,Salineiro,75492
+hr_profession_75493,Trabalhador de fabrico de foguetes (fogueteiro),75493
+hr_profession_75494,"Trabalhador de outros ofícios diversos, n.e.",75494
+hr_profession_81111,Mineiro,81111
+hr_profession_81112,Trabalhador das pedreiras,81112
+hr_profession_81121,Operador de instalações de processamento de minérios,81121
+hr_profession_81122,Operador de instalações de processamento de rochas,81122
+hr_profession_81130,"Perfurador de poços, sondador e similares",81130
+hr_profession_81141,Operador de máquinas para trabalhar o cimento,81141
+hr_profession_81142,Operador de máquinas para trabalhar a pedra,81142
+hr_profession_81143,Operador de máquinas para trabalhar outros minerais,81143
+hr_profession_81211,Operador de instalações de fornos e de primeira transformação de metais,81211
+hr_profession_81212,"Operador de instalações de fornos de segunda fusão, vazadores e laminadores, de metais ",81212
+hr_profession_81213,Operador de instalações de tratamento térmico de metais,81213
+hr_profession_81214,Operador de instalações de trefilagem e estiragem,81214
+hr_profession_81220,"Operador de máquinas de revestimento, metalização e acabamento de metais",81220
+hr_profession_81311,Operador de instalações e máquinas para moagem de substâncias químicas,81311
+hr_profession_81312,Operador de instalações e máquinas para tratamento térmico de produtos químicos,81312
+hr_profession_81313,"Operador de instalações e máquinas, para filtragem e separação química",81313
+hr_profession_81314,"Operador de instalações e máquinas, para reacção e verificação de produtos químicos ",81314
+hr_profession_81315,"Operador de instalações e máquinas, para petróleo e gás",81315
+hr_profession_81316,Operador de instalações e máquinas para outros tratamentos químicos,81316
+hr_profession_81320,Operador de máquinas para o fabrico de produtos fotográficos,81320
+hr_profession_81410,Operador de máquinas para o fabrico de produtos de borracha,81410
+hr_profession_81420,Operador de máquinas para o fabrico de produtos de matérias plásticas,81420
+hr_profession_81430,Operador de máquinas para o fabrico de produtos de papel,81430
+hr_profession_81510,"Operador de máquinas para preparar, fiar e bobinar, fibras têxteis ",81510
+hr_profession_81520,Operador de máquinas de tecer e tricotar,81520
+hr_profession_81530,Operador de máquinas de costura,81530
+hr_profession_81540,"Operador de máquinas de branquear, tingir e limpar, tecidos e outros têxteis",81540
+hr_profession_81550,Operador de máquinas para preparar peles com pêlo e couro,81550
+hr_profession_81560,Operador de máquinas de fabrico de calçado e similares,81560
+hr_profession_81570,Operador de máquinas de lavandaria,81570
+hr_profession_81590,"Outros operadores de máquinas para o fabrico de produtos têxteis, de pele com pêlo e couro",81590
+hr_profession_81601,Operador de máquinas de preparação de carne e peixe,81601
+hr_profession_81602,Operador de máquinas de fabrico de produtos lácteos,81602
+hr_profession_81603,"Operador de máquinas de moagem de cereais, de transformação de arroz e de fabricação de rações",81603
+hr_profession_81604,"Operador de máquinas de produtos de padaria, de pastelaria, de confeitaria e de massas alimentícias ",81604
+hr_profession_81605,"Operador de máquinas de tratamento de frutos, legumes, fabrico de azeite, óleos alimentares e margarinas ",81605
+hr_profession_81606,Operador de máquinas de produção e refinação de açúcar,81606
+hr_profession_81607,"Operador de máquinas para preparação de chá, café e cacau",81607
+hr_profession_81608,Operador de máquinas para preparação de vinhos e outras bebidas,81608
+hr_profession_81609,Operador de máquinas para o fabrico do tabaco,81609
+hr_profession_81710,Operador de instalações para o fabrico de pasta de papel e de papel,81710
+hr_profession_81720,Operador de instalações para o trabalho da madeira e cortiça,81720
+hr_profession_81811,Operador de instalações para o fabrico de vidro,81811
+hr_profession_81812,Operador de instalações para o fabrico de produtos cerâmicos,81812
+hr_profession_81820,Operador de máquinas a vapor e caldeiras,81820
+hr_profession_81830,"Operador de máquinas de embalar, encher e rotular",81830
+hr_profession_81891,"Operador de máquinas para corte, soldadura, isolamento, fabrico e enrolamento de cablagens",81891
+hr_profession_81892,"Operador de máquinas para fabrico de molas para estofos, colchões, veículos automóveis ou outros fins",81892
+hr_profession_81893,Operador de máquinas para fabrico de produtos de arame,81893
+hr_profession_81894,"Outros operadores de instalações fixas e de máquinas, diversas, n.e",81894
+hr_profession_82110,Montador de maquinaria mecânica,82110
+hr_profession_82120,Montador de equipamentos eléctricos e electrónicos,82120
+hr_profession_82190,Outros trabalhadores da montagem,82190
+hr_profession_83110,Maquinista de locomotivas,83110
+hr_profession_83120,"Guarda-freios, agulheiro e agente de manobras de caminhos-de-ferro",83120
+hr_profession_83210,Condutor de motociclos,83210
+hr_profession_83221,Motorista de táxis,83221
+hr_profession_83222,Motorista de automóveis ligeiros e carrinhas,83222
+hr_profession_83311,Motorista de autocarros,83311
+hr_profession_83312,Guarda-freio de eléctrico,83312
+hr_profession_83320,Motorista de veículos pesados de mercadorias,83320
+hr_profession_83410,"Operador de máquinas agrícolas e florestais, móveis",83410
+hr_profession_83420,"Operador de máquinas de escavação, terraplenagem e similares",83420
+hr_profession_83430,"Operador de gruas, guindastes e similares",83430
+hr_profession_83440,Operador de empilhadores,83440
+hr_profession_83500,Tripulação de convés de navios e similares,83500
+hr_profession_91110,Trabalhador de limpeza em casas particulares,91110
+hr_profession_91120,"Trabalhador de limpeza em escritórios, hotéis e outros estabelecimentos ",91120
+hr_profession_91210,Lavadeiro e engomador de roupa,91210
+hr_profession_91220,Lavador de veículos,91220
+hr_profession_91230,Lavador de janelas,91230
+hr_profession_91290,Outro trabalhador de limpeza manual,91290
+hr_profession_92110,Trabalhador não qualificado da agricultura (exclui horticultura e floricultura),92110
+hr_profession_92120,Trabalhador não qualificado da produção animal,92120
+hr_profession_92130,Trabalhador não qualificado da agricultura e produção animal combinadas,92130
+hr_profession_92140,Trabalhador não qualificado da floricultura e horticultura,92140
+hr_profession_92150,Trabalhador não qualificado da floresta,92150
+hr_profession_92161,Trabalhador não qualificado da pesca,92161
+hr_profession_92162,Trabalhador não qualificado da aquicultura,92162
+hr_profession_93111,Trabalhador não qualificado das minas,93111
+hr_profession_93112,Trabalhador não qualificado das pedreiras,93112
+hr_profession_93120,Trabalhador não qualificado de engenharia civil,93120
+hr_profession_93130,Trabalhador não qualificado da construção de edifícios,93130
+hr_profession_93210,Embalador manual da indústria transformadora,93210
+hr_profession_93290,Outros trabalhadores não qualificados da indústria transformadora,93290
+hr_profession_93310,Condutor de veículos accionados à mão ou ao pé,93310
+hr_profession_93320,Condutor de veículos de tracção animal,93320
+hr_profession_93330,Carregadores e descarregadores não qualificados de mercadorias,93330
+hr_profession_93340,Repositor de produtos em prateleiras,93340
+hr_profession_94110,Preparador de refeições rápidas,94110
+hr_profession_94120,Ajudante de cozinha,94120
+hr_profession_95100,Prestador de serviços na rua,95100
+hr_profession_95200,Vendedor ambulante (excepto de alimentos),95200
+hr_profession_96110,Trabalhador da recolha de resíduos,96110
+hr_profession_96120,Trabalhador da triagem de resíduos,96120
+hr_profession_96131,Cantoneiro de limpeza,96131
+hr_profession_96132,Empregado de lavabos e similares,96132
+hr_profession_96211,Estafeta,96211
+hr_profession_96212,Bagageiro,96212
+hr_profession_96213,Auxiliar de apoio administrativo (contínuo),96213
+hr_profession_96214,Distribuidor de mercadorias e similares,96214
+hr_profession_96221,Colocador de anúncios (montador de anúncios),96221
+hr_profession_96222,Outros trabalhadores polivalentes,96222
+hr_profession_96231,Leitor de contadores,96231
+hr_profession_96232,"Colector de dinheiro em máquinas de venda automática, parquímetros e similares",96232
+hr_profession_96240,Carregador de água e apanhador de lenha,96240
+hr_profession_96291,Coveiro,96291
+hr_profession_96292,"Outras profissões elementares diversas, n.e.",96292
