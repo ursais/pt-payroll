@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_users_view_form_profile_pt" model="ir.ui.view">
+        <field name="name">res.users.preferences.form.inherit.pt</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="hr.res_users_view_form_profile" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='portugal']" position="inside">
+                <group>
+                    <group string="Other Location Fields">
+                        <field
+                            name="l10n_pt_no_of_holders"
+                            invisible="marital not in ['married', 'cohabitant']"
+                        />
+                        <field
+                            name="l10n_pt_disability_spouse"
+                            invisible="marital not in ['married', 'cohabitant']"
+                        />
+                        <field
+                            name="l10n_pt_disability_degree_of_the_spouse"
+                            widget="percentage"
+                            invisible="marital not in ['married', 'cohabitant'] or not l10n_pt_disability_spouse"
+                        />
+                        <field
+                            name="l10n_pt_spouse_does_not_earn_category_a_or_h_income"
+                            invisible="marital not in ['married', 'cohabitant'] or not l10n_pt_disability_spouse"
+                        />
+                        <field name="l10n_pt_no_of_dependents_education_ticket" />
+                        <field
+                            name="l10n_pt_no_of_dep_wit_perm_disab_equal_to_or_gre_than_60"
+                        />
+                        <field name="l10n_pt_multiplication_factor_for_disabled" />
+                        <field name="l10n_pt_identification_type" />
+                    </group>
+
+                    <group string="Social Securaty Informatio">
+                        <field name="l10n_pt_contract_modality" />
+                        <field name="l10n_pt_employee_type_id" />
+                    </group>
+
+                    <group string="Fiscal data">
+                        <field name="l10n_pt_income_tax_rate" widget="percentage" />
+                        <field name="l10n_pt_income_tax_region" />
+                        <field name="l10n_pt_special_fiscal_regime_id" />
+                        <field name="l10n_pt_tax_office_id" />
+                        <field name="l10n_pt_disability" />
+                        <field
+                            name="l10n_pt_disability_degree"
+                            widget="percentage"
+                            invisible="not l10n_pt_disability"
+                        />
+                        <field
+                            name="l10n_pt_disabilit_armed_forces"
+                            invisible="not l10n_pt_disability"
+                        />
+                        <field name="l10n_pt_pensioner" />
+                        <field name="l10n_pt_red_of_wit_tax_form_home_loan_holders" />
+                    </group>
+
+                    <group string="Professional Information">
+                        <field name="l10n_pt_intern" />
+                        <field name="l10n_pt_corporate_body" />
+                        <field name="l10n_pt_goverment_member" />
+                        <field name="l10n_pt_temporary_worker" />
+                        <field name="l10n_pt_qualification_id" />
+                        <field name="l10n_pt_qualification_level" />
+                        <field name="l10n_pt_profession_id" />
+                        <field name="l10n_pt_profession_situation" />
+                        <field name="l10n_pt_irct" />
+                        <field name="l10n_pt_professional_category" />
+                        <field name="l10n_pt_syndicate" />
+                        <field name="l10n_pt_non_resident" />
+                    </group>
+                    <group string="Insurance">
+                        <field name="l10n_pt_insurance_company_id" />
+                        <field name="l10n_pt_insurance_policy_no" />
+                        <field name="l10n_pt_insurance_type" />
+                        <field name="l10n_pt_insurance_expiry_date" />
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

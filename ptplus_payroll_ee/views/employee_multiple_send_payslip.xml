@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="action_pt_send_payslip_by_email" model="ir.actions.server">
+        <field name="name">Send Payslip(s) By Email PT</field>
+        <field name="model_id" ref="ptplus_payroll_ee.model_hr_payslip" />
+        <field name="binding_model_id" ref="ptplus_payroll_ee.model_hr_payslip" />
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+                records.action_send_email()
+        </field>
+    </record>
+</odoo>

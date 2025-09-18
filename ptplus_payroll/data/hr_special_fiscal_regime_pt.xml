@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+        <record id="1_year_youth_irs" model="hr.special.fiscal.regime.pt">
+            <field name="code">100_year_youth_irs</field>
+            <field name="name">IRS Jovem 100% (1º Ano)</field>
+        </record>
+
+        <record id="2_year_youth_irs" model="hr.special.fiscal.regime.pt">
+            <field name="code">75_year_youth_irs</field>
+            <field name="name">IRS Jovem 75% (2º ao 4º Ano)</field>
+            <field name="active">1</field>
+        </record>
+
+        <record id="3_year_youth_irs" model="hr.special.fiscal.regime.pt">
+            <field name="code">50_year_youth_irs</field>
+            <field name="name">IRS Jovem 50% (5º ao 7º Ano)</field>
+        </record>
+
+        <record id="4_year_youth_irs" model="hr.special.fiscal.regime.pt">
+            <field name="code">4_year_youth_irs</field>
+            <field name="name">Nao aplicavel</field>
+            <field name="active">0</field>
+        </record>
+
+        <record id="5_year_youth_irs" model="hr.special.fiscal.regime.pt">
+            <field name="code">25_year_youth_irs</field>
+            <field name="name">IRS Jovem 25% (8º ao 10º Ano)</field>
+        </record>
+
+        <record
+        id="withholding_tax_holders_permanent_housing_leases"
+        model="hr.special.fiscal.regime.pt"
+    >
+            <field name="code">TIT_CONT_ARR_HABITA_PERM</field>
+            <field
+            name="name"
+        >Redução das Retenções na Fonte para Titulares de Contrato de Arrendamento para Habitação Permanente</field>
+        </record>
+</odoo>
