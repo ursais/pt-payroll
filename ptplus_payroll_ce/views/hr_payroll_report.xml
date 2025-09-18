@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="ptplus_payroll.action_report_payslip_pt" model="ir.actions.report">
+        <field name="binding_model_id" ref="payroll.model_hr_payslip" />
+    </record>
+</odoo>
