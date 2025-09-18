@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="view_company_form_pt" model="ir.ui.view">
+        <field name="name">res.company.form.pt</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form" />
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="country_code" invisible="1" />
+                <field
+                    name="l10n_pt_default_meal_allowance_amount_paid_in_ticket"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_meal_allowance_amount_paid_in_cash"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_meal_allowance_amount_paid_in_kind"
+                    invisible="1"
+                />
+                <field name="l10n_pt_default_overtime_first_hour_rate" invisible="1" />
+                <field
+                    name="l10n_pt_default_overtime_remaining_hours_rate"
+                    invisible="1"
+                />
+                <field name="l10n_pt_default_overtime_rest_days_rate" invisible="1" />
+                <field name="l10n_pt_default_overtime_workdays_rate" invisible="1" />
+                <field name="l10n_pt_default_overtime_holidays_rate" invisible="1" />
+                <field
+                    name="l10n_pt_default_overtime_saturday_and_holidays_rate"
+                    invisible="1"
+                />
+                <field name="l10n_pt_default_overtime_sunday_rate" invisible="1" />
+                <field
+                    name="l10n_pt_default_night_overtime_first_hour_rate"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_night_overtime_remaining_hours_rate"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_night_overtime_rest_days_rate"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_night_overtime_workdays_rate"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_night_overtime_holidays_rate"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_night_overtime_saturday_and_holidays_rate"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_night_overtime_sunday_rate"
+                    invisible="1"
+                />
+                <field name="l10n_pt_default_night_work_rate" invisible="1" />
+                <field
+                    name="l10n_pt_default_meal_allowance_payment_method"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_holiday_allowance_payment_method"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_holiday_allowance_payment_month"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_christmas_allowance_payment_method"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_christmas_allowance_payment_month"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_value_per_km_in_own_vehicle"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_value_per_km_in_public_transport"
+                    invisible="1"
+                />
+                <field name="l10n_pt_default_per_diem_national" invisible="1" />
+                <field name="l10n_pt_default_per_diem_international" invisible="1" />
+                <field
+                    name="l10n_pt_default_remote_work_expense_electricity"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_remote_work_expense_internet"
+                    invisible="1"
+                />
+                <field
+                    name="l10n_pt_default_remote_work_expense_computer_equipment"
+                    invisible="1"
+                />
+            </field>
+            <xpath expr="//div[hasclass('oe_title')]" position="after">
+                <group attrs="{'invisible': [('country_code', '!=', 'PT')]}">
+                    <group>
+                        <field name="l10n_pt_establishment_date" />
+                        <field name="l10n_pt_activity_start_date" />
+                    </group>
+                    <group>
+                        <field name="l10n_pt_company_type" />
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='vat']" position="after">
+                <field
+                    name="l10n_pt_nissee"
+                    attrs="{'invisible': [('country_code', '!=', 'PT')]}"
+                />
+                <field
+                    name="l10n_pt_employers_association"
+                    attrs="{'invisible': [('country_code', '!=', 'PT')]}"
+                />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

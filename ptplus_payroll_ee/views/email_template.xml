@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--Email template -->
+    <record id="email_template_edi_hr_payroll_pt" model="mail.template">
+        <field name="name">Payslip - Send Payslip by mail PT</field>
+        <field
+            name="subject"
+        >{{ object.employee_id.name }}, um novo recibo está disponível para si</field>
+        <field name="email_from">{{object.company_id.email}}</field>
+        <field name="email_to">{{object.employee_id.private_email}}</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip" />
+        <field name="auto_delete" eval="False" />
+        <field name="lang">pt_PT</field>
+        <field name="report_template" ref="ptplus_payroll.action_report_payslip_pt" />
+        <field name="report_name">{{(object.name or '').replace('/','-')}}</field>
+        <field name="body_html" type="html">
+            <div
+                style="font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; "
+            >
+                <p>Olá Caro(a) <t t-out="object.employee_id.name" />,</p>
+                <p>Por favor, encontre em anexo o seu <t
+                        t-out="object.name or ''"
+                    /> da <t t-out="object.company_id.name" />.</p>
+
+                <p>Se tiver alguma dúvida, não hesite em contactar o RH.</p><br />
+                <p>Obrigado(a).</p>
+                <p>Departamento de RH.</p>
+                <p><t t-out="object.company_id.name" /></p>
+            </div>
+       </field>
+    </record>
+</odoo>
