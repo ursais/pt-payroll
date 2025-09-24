@@ -9,6 +9,7 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//notebook" position="inside">
+                    <field name="l10n_pt_standard_rule" invisible="1" />
                     <field name="company_country_id" invisible="1" />
                     <field name="country_code" invisible="1" />
                     <page
@@ -39,10 +40,13 @@
                                 <field name="l10n_pt_affects_hourly_wage" />
                                 <field name="l10n_pt_affects_overtime_hourly_wage" />
                                 <field name="l10n_pt_monthly_income" />
+                                <!--
                                 <field
                                     name="l10n_pt_proportional_allowance"
                                     attrs="{'invisible': [('l10n_pt_category_code' ,'!=', 'ABONO')]}"
                                 />
+                                -->
+                                <field name="l10n_pt_proportional_allowance" />
                                 <field
                                     name="l10n_pt_paid_in_kind"
                                     attrs="{'readonly': [('l10n_pt_standard_rule', '=', True)]}"
@@ -124,11 +128,13 @@
                         name="attrs"
                     >{'readonly': [('l10n_pt_standard_rule', '=', True)]}</attribute>
                 </field>
+                <!--
                 <field name="struct_id" position="attributes">
                     <attribute
                         name="attrs"
                     >{'readonly': [('l10n_pt_standard_rule', '=', True)]}</attribute>
                 </field>
+                -->
             </field>
         </record>
 
