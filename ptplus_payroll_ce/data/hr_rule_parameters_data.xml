@@ -213,7 +213,7 @@
                 name="parameter_id"
                 ref="rule_parameter_tax_free_amount_per_diem_international_statutory_bodies"
             />
-            <field name="date_from" eval="datetime(2013, 1, 1).date()" />
+            <field name="date_from" eval="datetime(2014, 1, 1).date()" />
         </record>
 
         <record
