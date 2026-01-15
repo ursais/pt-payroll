@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record
+        id="hr_payroll.action_hr_payslip_by_employees"
+        model="ir.actions.act_window"
+    >
+        <field name="context">{'default_l10n_pt_payslip_run_id': active_id}</field>
+    </record>
+
+</odoo>

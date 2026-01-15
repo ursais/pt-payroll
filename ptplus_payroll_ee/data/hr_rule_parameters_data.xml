@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+        <!-- This file is duplicated in the EE and CE -->
+        <record
+        id="rule_parameter_tax_free_meal_allowance_in_cash"
+        model="hr.rule.parameter"
+    >
+            <field
+            name="name"
+        >Valor Isento - Subsídio de Alimentação Pago em Dinheiro</field>
+            <field name="code">valor_isento_subs_alimentacao_dinheiro</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_meal_allowance_in_cash_2017"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">4.77</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_meal_allowance_in_cash"
+        />
+            <field name="date_from" eval="datetime(2017, 7, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_meal_allowance_in_cash_10_2022"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">5.2</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_meal_allowance_in_cash"
+        />
+            <field name="date_from" eval="datetime(2022, 10, 1).date()" />
+        </record>
+
+        <record
+        id="rule_parameter_value_tax_free_meal_allowance_in_cash_01_2023"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">6</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_meal_allowance_in_cash"
+        />
+            <field name="date_from" eval="datetime(2023, 1, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_meal_allowance_in_cash_01_2026"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">6.15</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_meal_allowance_in_cash"
+        />
+            <field name="date_from" eval="datetime(2026, 1, 1).date()" />
+        </record>
+
+
+        <record
+        id="rule_parameter_tax_free_meal_allowance_in_kind"
+        model="hr.rule.parameter"
+    >
+            <field
+            name="name"
+        >Valor Isento - Subsídio de Alimentação Pago em Espécie</field>
+            <field name="code">valor_isento_subs_alimentacao_especie</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_meal_allowance_in_kind_2017"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">4.77</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_meal_allowance_in_kind"
+        />
+            <field name="date_from" eval="datetime(2017, 7, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_meal_allowance_in_kind_2022"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">5.2</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_meal_allowance_in_kind"
+        />
+            <field name="date_from" eval="datetime(2022, 10, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_meal_allowance_in_kind_01_2023"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">6</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_meal_allowance_in_kind"
+        />
+            <field name="date_from" eval="datetime(2023, 1, 1).date()" />
+        </record>
+
+        <record
+        id="rule_parameter_tax_free_meal_allowance_in_ticket_card"
+        model="hr.rule.parameter"
+    >
+            <field
+            name="name"
+        >Valor Isento - Subsídio de Alimentação Pago em Cartão/Ticket</field>
+            <field name="code">valor_isento_subs_alimentacao_ticket</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_meal_allowance_in_ticket_card_2017"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">7.63</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_meal_allowance_in_ticket_card"
+        />
+            <field name="date_from" eval="datetime(2017, 7, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_meal_allowance_in_ticket_card_10_2022"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">8.32</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_meal_allowance_in_ticket_card"
+        />
+            <field name="date_from" eval="datetime(2022, 10, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_meal_allowance_in_ticket_card_05_2023"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">9.6</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_meal_allowance_in_ticket_card"
+        />
+            <field name="date_from" eval="datetime(2023, 5, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_meal_allowance_in_ticket_card_01_2025"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">10.2</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_meal_allowance_in_ticket_card"
+        />
+            <field name="date_from" eval="datetime(2025, 1, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_meal_allowance_in_ticket_card_01_2026"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">10.46</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_meal_allowance_in_ticket_card"
+        />
+            <field name="date_from" eval="datetime(2026, 1, 1).date()" />
+        </record>
+
+        <record
+        id="rule_parameter_tax_free_amount_per_km_in_own_vehicle"
+        model="hr.rule.parameter"
+    >
+            <field name="name">Valor Isento - Deslocação em Viatura Própria</field>
+            <field name="code">valor_isento_deslocacao_viatura_propria</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_amount_per_km_in_own_vehicle"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">0.36</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_amount_per_km_in_own_vehicle"
+        />
+            <field name="date_from" eval="datetime(2013, 1, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_amount_per_km_in_own_vehicle_01_24"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">0.40</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_amount_per_km_in_own_vehicle"
+        />
+            <field name="date_from" eval="datetime(2024, 1, 1).date()" />
+        </record>
+
+        <record
+        id="rule_parameter_tax_free_amount_per_km_in_public_transport"
+        model="hr.rule.parameter"
+    >
+            <field name="name">Valor Isento - Deslocação em Transporte Público</field>
+            <field name="code">valor_isento_deslocacao_transporte_publico</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_amount_per_km_in_public_transport"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">0.11</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_amount_per_km_in_public_transport"
+        />
+            <field name="date_from" eval="datetime(2013, 1, 1).date()" />
+        </record>
+
+        <record
+        id="rule_parameter_tax_free_amount_per_diem_national_statutory_bodies"
+        model="hr.rule.parameter"
+    >
+            <field
+            name="name"
+        >Valor Isento - Ajudas de Custo Nacional - Membros dos Órgãos Estatutários</field>
+            <field
+            name="code"
+        >valor_isento_ajudas_de_custo_nacional_orgaos_estatutarios</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_amount_per_diem_national_statutory_bodies"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">69.19</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_amount_per_diem_national_statutory_bodies"
+        />
+            <field name="date_from" eval="datetime(2013, 1, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_amount_per_diem_national_statutory_bodies_2025"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">72.65</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_amount_per_diem_national_statutory_bodies"
+        />
+            <field name="date_from" eval="datetime(2025, 1, 1).date()" />
+        </record>
+
+        <record
+        id="rule_parameter_tax_free_amount_per_diem_international_statutory_bodies"
+        model="hr.rule.parameter"
+    >
+            <field
+            name="name"
+        >Valor Isento - Ajudas de Custo Internacional - Membros dos Orgãos Estatutários</field>
+            <field
+            name="code"
+        >valor_isento_ajudas_de_custo_internacional_orgaos_estatutarios</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_amount_per_diem_international_statutory_bodies"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">100.24</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_amount_per_diem_international_statutory_bodies"
+        />
+            <field name="date_from" eval="datetime(2013, 1, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_amount_per_diem_international_statutory_bodies_01_2024"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">167.07</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_amount_per_diem_international_statutory_bodies"
+        />
+            <field name="date_from" eval="datetime(2024, 1, 1).date()" />
+        </record>
+
+        <record
+        id="rule_parameter_tax_free_amount_per_diem_national_remaining_employees"
+        model="hr.rule.parameter"
+    >
+            <field
+            name="name"
+        >Valor Isento - Ajudas de Custo Nacional - Restantes trabalhadores</field>
+            <field
+            name="code"
+        >valor_isento_ajudas_de_custo_nacional_trabalhadores</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_amount_per_diem_national_remaining_employees"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">50.2</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_amount_per_diem_national_remaining_employees"
+        />
+            <field name="date_from" eval="datetime(2013, 1, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_amt_per_diem_ntnl_rmng_employees_01_2024"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">62.75</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_amount_per_diem_national_remaining_employees"
+        />
+            <field name="date_from" eval="datetime(2024, 1, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_amt_per_diem_ntnl_rmng_employees_01_2025"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">65.89</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_amount_per_diem_national_remaining_employees"
+        />
+            <field name="date_from" eval="datetime(2025, 1, 1).date()" />
+        </record>
+
+        <record
+        id="rule_parameter_tax_free_amount_per_diem_international_remaining_employees"
+        model="hr.rule.parameter"
+    >
+            <field
+            name="name"
+        >Valor Isento - Ajudas de Custo Internacional - Restantes Trabalhadores</field>
+            <field
+            name="code"
+        >valor_isento_ajudas_de_custo_internacional_trabalhadores</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_amount_per_diem_international_remaining_employees"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">89.35</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_amount_per_diem_international_remaining_employees"
+        />
+            <field name="date_from" eval="datetime(2013, 1, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_amount_per_diem_itntnl_rmng_employees_01_2024"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">148.91</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_amount_per_diem_international_remaining_employees"
+        />
+            <field name="date_from" eval="datetime(2024, 1, 1).date()" />
+        </record>
+
+
+        <record id="rule_parameter_national_minimum_wage" model="hr.rule.parameter">
+            <field name="name">Salário Mínimo Nacional</field>
+            <field name="code">salario_minimo_nacional</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+
+        <record
+        id="rule_parameter_value_rule_parameter_national_minimum_wage_01_2023"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">760</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_national_minimum_wage"
+        />
+            <field name="date_from" eval="datetime(2023, 1, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_rule_parameter_national_minimum_wage_01_2024"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">820</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_national_minimum_wage"
+        />
+            <field name="date_from" eval="datetime(2024, 1, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_rule_parameter_national_minimum_wage_01_2025"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">870</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_national_minimum_wage"
+        />
+            <field name="date_from" eval="datetime(2025, 1, 1).date()" />
+        </record>
+            <record
+        id="rule_parameter_value_rule_parameter_national_minimum_wage_01_2026"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">920</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_national_minimum_wage"
+        />
+            <field name="date_from" eval="datetime(2026, 1, 1).date()" />
+        </record>
+        <!--work expenses-->
+        <record
+        id="rule_parameter_tax_free_remote_work_expense_electricity"
+        model="hr.rule.parameter"
+    >
+            <field
+            name="name"
+        >Valor Isento - Despesas em Teletrabalho Eletricidade</field>
+            <field
+            name="code"
+        >valor_isento_despesas_em_teletrabalho_eletricidade</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_remote_work_expense_electricity_09_2023"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">0.10</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_remote_work_expense_electricity"
+        />
+            <field name="date_from" eval="datetime(2023, 9, 29).date()" />
+        </record>
+
+        <record
+        id="rule_parameter_tax_free_remote_work_expense_internet"
+        model="hr.rule.parameter"
+    >
+            <field name="name">Valor Isento - Despesas em Teletrabalho Internet</field>
+            <field name="code">valor_isento_despesas_em_teletrabalho_internet</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_remote_work_expense_internet_09_2023"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">0.40</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_remote_work_expense_internet"
+        />
+            <field name="date_from" eval="datetime(2023, 9, 29).date()" />
+        </record>
+
+        <record
+        id="rule_parameter_tax_free_remote_work_expense_computer_equipment"
+        model="hr.rule.parameter"
+    >
+            <field
+            name="name"
+        >Valor Isento - Despesas em Teletrabalho Equipamento Informático</field>
+            <field
+            name="code"
+        >valor_isento_despesas_em_teletrabalho_equipamento_informatico</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+        <record
+        id="rule_parameter_value_tax_free_remote_work_expense_computer_equipment_09_2023"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">0.50</field>
+            <field
+            name="rule_parameter_id"
+            ref="rule_parameter_tax_free_remote_work_expense_computer_equipment"
+        />
+            <field name="date_from" eval="datetime(2023, 9, 29).date()" />
+        </record>
+
+        <record id="rule_parameter_value_value_of_ais" model="hr.rule.parameter">
+            <field name="name">Valor de IAS</field>
+            <field name="code">valor_de_ias</field>
+            <field name="country_id" ref="base.pt" />
+        </record>
+        <record
+        id="rule_parameter_value_value_of_ais_01_2023"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">480.43</field>
+            <field name="rule_parameter_id" ref="rule_parameter_value_value_of_ais" />
+            <field name="date_from" eval="datetime(2023, 1, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_value_of_ais_01_2024"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">509.26</field>
+            <field name="rule_parameter_id" ref="rule_parameter_value_value_of_ais" />
+            <field name="date_from" eval="datetime(2024, 1, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_value_of_ais_01_2025"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">522.50</field>
+            <field name="rule_parameter_id" ref="rule_parameter_value_value_of_ais" />
+            <field name="date_from" eval="datetime(2025, 1, 1).date()" />
+        </record>
+        <record
+        id="rule_parameter_value_value_of_ais_01_2026"
+        model="hr.rule.parameter.value"
+    >
+            <field name="parameter_value">537.13</field>
+            <field name="rule_parameter_id" ref="rule_parameter_value_value_of_ais" />
+            <field name="date_from" eval="datetime(2026, 1, 1).date()" />
+        </record>
+</odoo>

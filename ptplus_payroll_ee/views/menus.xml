@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem
+        id="ptplus_payroll_settings_menu"
+        name="Portugal"
+        parent="hr_work_entry_contract_enterprise.menu_hr_payroll_configuration"
+        sequence="999"
+        groups="hr_payroll.group_hr_payroll_user"
+    >
+    </menuitem>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_income_tax_pt_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_insurance_company_pt_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_profession_pt_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_qualification_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record
+        model="ir.ui.menu"
+        id="ptplus_payroll.menu_hr_social_security_tax_pt_action"
+    >
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_tax_office_pt_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record model="ir.ui.menu" id="ptplus_payroll.menu_hr_professional_category_action">
+        <field name="parent_id" ref="ptplus_payroll_settings_menu" />
+    </record>
+
+    <record id="action_dataport_log_tree" model="ir.actions.act_window">
+        <field name="name">Dataport Log</field>
+        <field name="res_model">dataport.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="ptplus.dataport_log_view_tree" />
+        <field name="domain">[('type', 'ilike', 'payroll%')]</field>
+        <!-- <field name="search_view_id" ref="dataport_log_view_search"/>  -->
+    </record>
+
+    <menuitem
+        id="payroll_menu_report_pt"
+        name="Portugal"
+        parent="hr_payroll.menu_hr_payroll_report"
+        groups="hr_payroll.group_hr_payroll_user"
+    >
+        <menuitem
+            id="menu_pt_dataport_log"
+            sequence="5"
+            groups="hr_payroll.group_hr_payroll_user"
+            action="action_dataport_log_tree"
+        />
+    </menuitem>
+</odoo>

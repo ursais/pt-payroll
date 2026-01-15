@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="relatorio_unico_statement_form" model="ir.ui.view">
+        <field name="name">relatorio.unico.statement.wizard.pt.form</field>
+        <field name="model">payroll.statement.wizard.pt</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="ptplus_payroll.wizard_payroll_statement_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="after">
+                <notebook tabpos="up" invisible="state != 'select'">
+                    <!-- ######## ANNEX ZERO ########-->
+                    <page
+                        string="I. Employer Identification"
+                        name="employer_id"
+                        invisible="single_report_type != 'annex_zero'"
+                    >
+                        <group>
+                            <group class="o_row">
+                                <field
+                                    name="ru_company_eac"
+                                    string="5. Main Company Economic Activity (EAC)"
+                                />
+                            </group>
+                        </group>
+                    </page>
+                    <page
+                        string="III. People at Service"
+                        name="people_service"
+                        invisible="single_report_type != 'annex_zero'"
+                    >
+                        <group>
+                            <separator string="2. Workers Posted Abroad" />
+                            <group class="o_row">
+                                <field
+                                    name="ru_posted_workers"
+                                    string="No. of workers"
+                                />
+                                <field
+                                    name="ru_number_of_postings"
+                                    string="No. of postings"
+                                />
+                            </group>
+                        </group>
+                    </page>
+                    <page
+                        string="V. Overtime Work"
+                        name="overtime_work"
+                        invisible="single_report_type != 'annex_zero'"
+                    >
+                        <group>
+                            <group class="o_row">
+                                <field
+                                    name="ru_overtime_workers_approval"
+                                    string="2. Approval of Overtime by Workers Committee/Union"
+                                />
+                            </group>
+                        </group>
+                    </page>
+                    <page
+                        string="VI. Temporary Workers"
+                        name="temp_workers"
+                        invisible="single_report_type != 'annex_zero'"
+                    >
+                        <group class="o_row">
+                            <field name="ru_temporary_workers_usage" />
+                        </group>
+                        <group invisible="ru_temporary_workers_usage == False">
+                            <separator string="1. Number of Temporary Workers" />
+                            <group class="o_row">
+                                <field
+                                    name="ru_no_temp_workers_31_oct"
+                                    string="October 31st"
+                                />
+                                <field
+                                    name="ru_no_temp_workers_31_dec"
+                                    string="December 31st"
+                                />
+                                <field
+                                    name="ru_no_temp_workers_average"
+                                    string="Average Throughout the Year"
+                                />
+                            </group>
+                            <separator
+                                string="2. Temporary Workers In and Outflow Throughout the Year"
+                            />
+                            <separator string="2.1 Entries" />
+                            <group class="o_row">
+                                <field name="ru_temp_workers_in_male" string="Male" />
+                                <field
+                                    name="ru_temp_workers_in_female"
+                                    string="Female"
+                                />
+                            </group>
+                            <separator string="2.2 Outs" />
+                            <group class="o_row">
+                                <field name="ru_temp_workers_out_male" string="Male" />
+                                <field
+                                    name="ru_temp_workers_out_female"
+                                    string="Female"
+                                />
+                            </group>
+                        </group>
+                    </page>
+                    <page
+                        string="VII. Workers With Impairments"
+                        name="workers_with_impairments"
+                        invisible="single_report_type != 'annex_zero'"
+                    >
+                        <separator string="2. Distribution by Education" />
+                        <table class="ru_table">
+                            <th />
+                            <th><b>Below Third Grade Basic</b></th>
+                            <th><b>Third Grade Basic</b></th>
+                            <th><b>Secondary Education</b></th>
+                            <th><b>Post Secondary Education</b></th>
+                            <th><b>Superior Education</b></th>
+                            <tbody>
+                                <tr>
+                                    <td><b>1.1 Incapacity Under 60%</b></td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_under_3_basic_disab_60"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_under_3_basic_disab_60"
+                                            /></p>
+                                    </td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_3_basic_disab_60"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_3_basic_disab_60"
+                                            /></p>
+                                    </td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_secondary_disab_60"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_secondary_disab_60"
+                                            /></p>
+                                    </td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_post_secondary_disab_60"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_post_secondary_disab_60"
+                                            /></p>
+                                    </td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_superior_disab_60"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_superior_disab_60"
+                                            /></p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b>1.2 Incapacity Between 60% and 80%</b></td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_under_3_basic_disab_80"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_under_3_basic_disab_80"
+                                            /></p>
+                                    </td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_3_basic_disab_80"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_3_basic_disab_80"
+                                            /></p>
+                                    </td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_secondary_disab_80"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_secondary_disab_80"
+                                            /></p>
+                                    </td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_post_secondary_disab_80"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_post_secondary_disab_80"
+                                            /></p>
+                                    </td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_superior_disab_80"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_superior_disab_80"
+                                            /></p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b>1.2 Incapacity Above 80%</b></td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_under_3_basic_disab_100"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_under_3_basic_disab_100"
+                                            /></p>
+                                    </td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_3_basic_disab_100"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_3_basic_disab_100"
+                                            /></p>
+                                    </td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_secondary_disab_100"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_secondary_disab_100"
+                                            /></p>
+                                    </td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_post_secondary_disab_100"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_post_secondary_disab_100"
+                                            /></p>
+                                    </td>
+                                    <td>
+                                        <p class="o_row">H:<field
+                                                name="ru_men_superior_disab_100"
+                                            /></p>
+                                        <p class="o_row">M:<field
+                                                name="ru_women_superior_disab_100"
+                                            /></p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </page>
+                    <page
+                        string="VIII. Employer Economic Data"
+                        name="employer_economic_data"
+                        invisible="single_report_type != 'annex_zero'"
+                    >
+                        <group>
+                            <separator string="2. Share Capital Percentage" />
+                            <group class="o_row">
+                                <field
+                                    name="ru_percent_private_national_share_capital"
+                                    string="Private National:"
+                                />
+                                <field
+                                    name="ru_percent_foreign_share_capital"
+                                    string="Foreign:"
+                                />
+                                <field
+                                    name="ru_percent_public_national_share_capital"
+                                    string="Public National:"
+                                />
+                            </group>
+                            <separator string="3. Professional Training Costs" />
+                            <group class="o_row">
+                                <field
+                                    name="ru_training_hours_compensation"
+                                    string="Training Hours:"
+                                />
+                                <field name="ru_remaining_employer_funding" />
+                                <field name="ru_european_social_fund" />
+                                <field name="ru_other_funding_sources" />
+                            </group>
+                            <separator
+                                string="4. Occupational health and safety charges"
+                            />
+                            <group class="o_row">
+                                <field name="ru_health_safety_services_organization" />
+                                <field name="ru_workspaces_organization_modification" />
+                                <field name="ru_equipment_purchase" />
+                                <field name="ru_training_information_consultation" />
+                                <field name="ru_other_expenses" />
+                            </group>
+                        </group>
+                    </page>
+                    <field name="ru_complementary_data" invisible="True" />
+                    <page
+                        string="IX. Complementary Data"
+                        name="complementary_data "
+                        invisible="ru_complementary_data != True"
+                    >
+                        <separator string="2.1 Charges administered by the employer" />
+                        <table>
+                            <tr>
+                                <td class="p-2"><label
+                                        for="ru_admin_sickness_disability_allowance"
+                                        string="Sickness and Occupational Disease Allowance"
+                                    /></td>
+                                <td class="p-2"><field
+                                        name="ru_admin_sickness_disability_allowance"
+                                    /> </td>
+                                <td class="p-2">Code</td>
+                                <td class="p-2"><field
+                                        name="ru_admin_sickness_disability_allowance_code"
+                                        placeholder="e.g 1"
+                                    /></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2"><label
+                                        for="ru_admin_retirement_disability_survivor_pensions"
+                                        string="Retirement, Disability, and Survivor Pensions"
+                                    /></td>
+                                <td class="p-2"><field
+                                        name="ru_admin_retirement_disability_survivor_pensions"
+                                    /> </td>
+                                <td class="p-2">Code</td>
+                                <td class="p-2"><field
+                                        name="ru_admin_retirement_disability_survivor_pensions_code"
+                                        placeholder="e.g 1"
+                                    /></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2"><label
+                                        for="ru_admin_other_social_security_benefits"
+                                        string="Other Social Security Benefits"
+                                    /></td>
+                                <td class="p-2"><field
+                                        name="ru_admin_other_social_security_benefits"
+                                    /> </td>
+                                <td class="p-2">Code</td>
+                                <td class="p-2"><field
+                                        name="ru_admin_other_social_security_benefits_code"
+                                        placeholder="e.g 1"
+                                    /></td>
+                            </tr>
+                        </table>
+                        <separator
+                            string="2.2 Charges NOT administered by the employer"
+                        />
+                        <table>
+                            <tr>
+                                <td class="p-2"><label
+                                        for="ru_non_admin_sickness_disability_allowance"
+                                        string="Sickness and Occupational Disease Allowance"
+                                    /></td>
+                                <td class="p-2"><field
+                                        name="ru_non_admin_sickness_disability_allowance"
+                                    /> </td>
+                                <td class="p-2">Code</td>
+                                <td class="p-2"><field
+                                        name="ru_non_admin_sickness_disability_allowance_code"
+                                        placeholder="e.g 1"
+                                    /></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2"><label
+                                        for="ru_non_admin_retirement_disability_survivor_pensions"
+                                        string="Retirement, Disability, and Survivor Pensions"
+                                    /></td>
+                                <td class="p-2"><field
+                                        name="ru_non_admin_retirement_disability_survivor_pensions"
+                                    /> </td>
+                                <td class="p-2">Code</td>
+                                <td class="p-2"><field
+                                        name="ru_non_admin_retirement_disability_survivor_pensions_code"
+                                        placeholder="e.g 1"
+                                    /></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2"><label
+                                        for="ru_non_admin_other_social_security_benefits"
+                                        string="Other Social Security Benefits"
+                                    /></td>
+                                <td class="p-2"><field
+                                        name="ru_non_admin_other_social_security_benefits"
+                                    /> </td>
+                                <td class="p-2">Code</td>
+                                <td class="p-2"><field
+                                        name="ru_non_admin_other_social_security_benefits_code"
+                                        placeholder="e.g 1"
+                                    /></td>
+                            </tr>
+                        </table>
+                        <group>
+                            <separator
+                                string="2.3 Social action and support expenses"
+                            />
+                            <group>
+                                <field name="ru_social_action_support_expenses" />
+                            </group>
+                        </group>
+                    </page>
+                    <!-- ######## ANNEX A ########-->
+                    <page
+                        string="I. Local Unit (Establishment)"
+                        name="local_unit"
+                        invisible="single_report_type != 'annex_a'"
+                    >
+                        <field name="ru_establisment_ids" nolabel="1">
+                            <list editable="bottom" create="0" delete="false">
+                                <field name="establishment_id" />
+                                <field name="cae_31out" />
+                                <field name="juridical_nature" />
+                            </list>
+                        </field>
+                    </page>
+                    <page
+                        string="II. People at Work"
+                        name="people_at_work"
+                        invisible="single_report_type != 'annex_a'"
+                    >
+                        <field name="ru_employee_ids_annex_a" nolabel="1">
+                            <list create="0" delete="false">
+                                <field name="establishment_id" />
+                                <field name="employee_id" />
+                                <field name="social_scheme" optional="hide" />
+                                <field name="last_promo_date" optional="hide" />
+                                <field name="irct_applicability" optional="hide" />
+                                <field name="work_regime" optional="hide" />
+                                <field name="work_duration" optional="hide" />
+                                <field name="work_organization" optional="hide" />
+                                <field name="low_pay_reason" optional="hide" />
+                                <field name="other_allowances" optional="hide" />
+                                <field name="irregular_oct_pay" optional="hide" />
+                                <field name="overtime_oct" optional="hide" />
+                                <field name="hours_art227_1" optional="hide" />
+                                <field name="hours_art227_2" optional="hide" />
+                            </list>
+                            <form string="Employee Info">
+                                <group>
+                                    <field name="establishment_id" />
+                                    <field name="employee_id" />
+                                    <field name="social_scheme" />
+                                    <field name="last_promo_date" />
+                                    <field name="irct_applicability" />
+                                    <field name="work_regime" />
+                                    <field name="work_duration" />
+                                    <field name="work_organization" />
+                                    <field name="low_pay_reason" />
+                                    <field name="other_allowances" />
+                                    <field name="irregular_oct_pay" />
+                                    <field name="overtime_oct" />
+                                    <field name="hours_art227_1" />
+                                    <field name="hours_art227_2" />
+                                </group>
+                            </form>
+                        </field>
+                    </page>
+                    <!-- ######## ANNEX B ########-->
+                    <page
+                        string="I. Employer Identification"
+                        name="employer_id"
+                        invisible="single_report_type != 'annex_b'"
+                    >
+                        <group>
+                            <group class="o_row">
+                                <field
+                                    name="ru_company_eac"
+                                    string="2. Company Economic Activity (EAC) as of December 31"
+                                />
+                            </group>
+                        </group>
+                    </page>
+                    <page
+                        string="II. Workers"
+                        name="workers"
+                        invisible="single_report_type != 'annex_b'"
+                    >
+                        <field name="ru_employee_ids_annex_b" nolabel="1">
+                            <list create="0" delete="false">
+                                <field name="employee_id" />
+                                <field name="contract_id" />
+                                <field name="social_scheme" />
+                                <field name="entry_reason" />
+                                <field name="h_1art227" />
+                                <field name="h_2art227" />
+                            </list>
+                            <form string="Employee Info">
+                                <group>
+                                    <field name="employee_id" />
+                                    <field name="contract_id" />
+                                    <field name="social_scheme" />
+                                    <field name="entry_reason" />
+                                    <field name="h_1art227" />
+                                    <field name="h_2art227" />
+                                </group>
+                            </form>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

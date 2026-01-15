@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="hr_contract_view_form_pt" model="ir.ui.view">
+        <field name="name">hr.contract.form.pt</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form" />
+        <field name="arch" type="xml">
+            <field name="active" position="after">
+                <field name="country_code" invisible="1" />
+            </field>
+            <page name="other" position="inside">
+                <group
+                    name="info"
+                    string="More Information"
+                    invisible="country_code != 'PT'"
+                >
+                    <field
+                        name="l10n_pt_reason_for_end_of_contract"
+                        required="state == 'cancel'"
+                    />
+                </group>
+            </page>
+            <xpath expr="//group[@name='salary_info']">
+                <group string="Contract Data" invisible="country_code != 'PT'">
+                    <field name="l10n_pt_contract_modality" invisible="1" />
+                    <field name="l10n_pt_provision_of_work" />
+                    <field name="l10n_pt_contract_reason" />
+                </group>
+                <group string="Meal Allowance" invisible="country_code != 'PT'">
+                    <label
+                        for="l10n_pt_meal_allowance_amount"
+                        string="Subsidy Amount"
+                    />
+                    <div class="o_row">
+                        <field name="l10n_pt_meal_allowance_amount" widget="monetary" />
+                        <span>/ day</span>
+                    </div>
+                    <field
+                        name="l10n_pt_meal_allowance_payment_method"
+                        string="Payment Method"
+                    />
+                    <field name="l10n_pt_hours_to_count_for_daily_meal" />
+                    <field
+                        name="l10n_pt_meal_allowance_card_no"
+                        string="Meal Card No."
+                    />
+                    <field
+                        name="l10n_pt_automatically_processed_meal_allowance"
+                        string="Automatically Processed"
+                    />
+                </group>
+                <group string="Holiday Allowance" invisible="country_code != 'PT'">
+                    <field
+                        name="l10n_pt_holiday_allowance_payment_method"
+                        string="Payment Method"
+                    />
+                    <field
+                        name="l10n_pt_holiday_allowance_payment_month"
+                        string="Payment Month"
+                    />
+                        <field
+                        name="l10n_pt_holiday_allowance_independent_receipt"
+                        string="Independent Receipt"
+                        invisible="not l10n_pt_holiday_allowance_payment_method or l10n_pt_holiday_allowance_payment_method == 'twelfths_to_100'"
+                    />
+                    </group>
+                    <group
+                    string="Christmas Allowance"
+                    invisible="country_code != 'PT'"
+                >
+                        <field
+                        name="l10n_pt_christmas_allowance_payment_method"
+                        string="Payment Method"
+                    />
+                    <field
+                        name="l10n_pt_christmas_allowance_payment_month"
+                        string="Payment Month"
+                    />
+                        <field
+                        name="l10n_pt_christmas_allowance_independent_receipt"
+                        string="Independent Receipt"
+                        invisible="not l10n_pt_christmas_allowance_payment_method or l10n_pt_christmas_allowance_payment_method == 'twelfths_to_100'"
+                    />
+                    </group>
+                    <group string="Overtime Work" invisible="country_code != 'PT'">
+                        <field
+                        name="l10n_pt_overtime_first_hour_rate"
+                        string="Overtime First Hour"
+                        widget="percentage"
+                    />
+                    <field
+                        name="l10n_pt_overtime_remaining_hours_rate"
+                        string="Overtime Remaining Hours"
+                        widget="percentage"
+                    />
+                    <field
+                        name="l10n_pt_overtime_rest_days_rate"
+                        string="Overtime Rest Days"
+                        widget="percentage"
+                    />
+                    <field
+                        name="l10n_pt_overtime_workdays_rate"
+                        string="Overtime Workdays"
+                        widget="percentage"
+                    />
+                    <field
+                        name="l10n_pt_overtime_holidays_rate"
+                        string="Overtime Holidays"
+                        widget="percentage"
+                    />
+                    <field
+                        name="l10n_pt_overtime_saturday_and_holidays_rate"
+                        string="Overtime Saturday and Holidays"
+                        widget="percentage"
+                    />
+                    <field
+                        name="l10n_pt_overtime_sunday_rate"
+                        string="Overtime Sunday"
+                        widget="percentage"
+                    />
+                    </group>
+                    <group
+                    string="Overtime Work From 100º Hour"
+                    invisible="country_code != 'PT'"
+                >
+                        <field
+                        name="l10n_pt_overtime_first_hour_rate_100"
+                        string="Overtime First Hour"
+                        widget="percentage"
+                    />
+                        <field
+                        name="l10n_pt_overtime_remaining_hours_rate_100"
+                        string="Overtime Remaining Hours"
+                        widget="percentage"
+                    />
+                        <field
+                        name="l10n_pt_overtime_rest_days_rate_100"
+                        string="Overtime Rest Days"
+                        widget="percentage"
+                    />
+                        <field
+                        name="l10n_pt_overtime_workdays_rate_100"
+                        string="Overtime Workdays"
+                        widget="percentage"
+                    />
+                        <field
+                        name="l10n_pt_overtime_holidays_rate_100"
+                        string="Overtime Holidays"
+                        widget="percentage"
+                    />
+                        <field
+                        name="l10n_pt_overtime_saturday_and_holidays_rate_100"
+                        string="Overtime Saturday and Holidays"
+                        widget="percentage"
+                    />
+                        <field
+                        name="l10n_pt_overtime_sunday_rate_100"
+                        string="Overtime Sunday"
+                        widget="percentage"
+                    />
+                    </group>
+                    <group string="Night Overtime" invisible="country_code != 'PT'">
+                        <field
+                        name="l10n_pt_night_overtime_first_hour_rate"
+                        string="Overtime First Hour"
+                        widget="percentage"
+                    />
+                    <field
+                        name="l10n_pt_night_overtime_remaining_hours_rate"
+                        string="Overtime Remaining Hours"
+                        widget="percentage"
+                    />
+                    <field
+                        name="l10n_pt_night_overtime_rest_days_rate"
+                        string="Overtime Rest Days"
+                        widget="percentage"
+                    />
+                    <field
+                        name="l10n_pt_night_overtime_workdays_rate"
+                        string="Overtime Workdays"
+                        widget="percentage"
+                    />
+                    <field
+                        name="l10n_pt_night_overtime_holidays_rate"
+                        string="Overtime Holidays"
+                        widget="percentage"
+                    />
+                    <field
+                        name="l10n_pt_night_overtime_saturday_and_holidays_rate"
+                        string="Overtime Saturday and Holidays"
+                        widget="percentage"
+                    />
+                    <field
+                        name="l10n_pt_night_overtime_sunday_rate"
+                        string="Overtime Sunday"
+                        widget="percentage"
+                    />
+                </group>
+                <group string="Night Work" invisible="country_code != 'PT'">
+                    <field
+                        name="l10n_pt_night_work_rate"
+                        string="Night Work"
+                        widget="percentage"
+                    />
+                </group>
+                <group string="Other Allowances" invisible="country_code != 'PT'">
+                    <label for="l10n_pt_diuturnities" widget="monetary" />
+                    <div class="o_row">
+                        <field name="l10n_pt_diuturnities" widget="monetary" />
+                        <span>/ month</span>
+                    </div>
+                    <label for="l10n_pt_failures_allowance" />
+                    <div class="o_row">
+                        <field name="l10n_pt_failures_allowance" widget="monetary" />
+                        <span>/ month</span>
+                    </div>
+                    <field
+                        name="l10n_pt_work_schedule_exemption_option"
+                        string="Work Schedule Exemption"
+                    />
+                    <label
+                        for="l10n_pt_work_schedule_exemption_value"
+                        invisible="l10n_pt_work_schedule_exemption_option != 'value'"
+                    />
+                    <div
+                        class="o_row"
+                        invisible="l10n_pt_work_schedule_exemption_option != 'value'"
+                    >
+                        <field
+                            name="l10n_pt_work_schedule_exemption_value"
+                            widget="monetary"
+                        />
+                        <span>/ month</span>
+                    </div>
+                    <label
+                        for="l10n_pt_work_schedule_exemption_rate"
+                        invisible="l10n_pt_work_schedule_exemption_option != 'rate'"
+                    />
+                    <div
+                        class="o_row"
+                        invisible="l10n_pt_work_schedule_exemption_option != 'rate'"
+                    >
+                        <field
+                            name="l10n_pt_work_schedule_exemption_rate"
+                            widget="percentage"
+                        />
+                        <span>/ month</span>
+                    </div>
+                    <field name="l10n_pt_shift_regime_option" string="Shift Regime" />
+                    <label
+                        for="l10n_pt_shift_regime_rate"
+                        invisible="l10n_pt_shift_regime_option not in ['two_shift_regime', 'three_shift_regime', 'four_shift_regime', 'five_shift_regime']"
+                    />
+                    <div
+                        class="o_row"
+                        invisible="l10n_pt_shift_regime_option not in ['two_shift_regime', 'three_shift_regime', 'four_shift_regime', 'five_shift_regime']"
+                    >
+                        <field name="l10n_pt_shift_regime_rate" widget="percentage" />
+                        <span>/ month</span>
+                    </div>
+                </group>
+                <group string="Travel and Per Diems" invisible="country_code != 'PT'">
+                    <label for="l10n_pt_value_per_km_in_own_vehicle" />
+                    <div class="o_row">
+                        <field
+                            name="l10n_pt_value_per_km_in_own_vehicle"
+                            widget="monetary"
+                        />
+                        <span>/ Km</span>
+                    </div>
+                    <label for="l10n_pt_value_per_km_in_public_transport" />
+                    <div class="o_row">
+                        <field
+                            name="l10n_pt_value_per_km_in_public_transport"
+                            widget="monetary"
+                        />
+                        <span>/ Km</span>
+                    </div>
+                    <field name="l10n_pt_per_diem_national" widget="monetary" />
+                    <field name="l10n_pt_per_diem_international" widget="monetary" />
+                    <label for="l10n_pt_travel_allowance" widget="monetary" />
+                    <div class="o_row">
+                        <field name="l10n_pt_travel_allowance" widget="monetary" />
+                        <span>/ day</span>
+                    </div>
+                </group>
+                <group string="Work Expenses" invisible="country_code != 'PT'">
+                    <label
+                        for="l10n_pt_remote_work_expense_electricity"
+                        widget="monetary"
+                    />
+                    <div class="o_row">
+                        <field
+                            name="l10n_pt_remote_work_expense_electricity"
+                            widget="monetary"
+                        />
+                        <span>/ day</span>
+                    </div>
+                    <label
+                        for="l10n_pt_remote_work_expense_internet"
+                        widget="monetary"
+                    />
+                    <div class="o_row">
+                        <field
+                            name="l10n_pt_remote_work_expense_internet"
+                            widget="monetary"
+                        />
+                        <span>/ day</span>
+                    </div>
+                    <label
+                        for="l10n_pt_remote_work_expense_computer_equipment"
+                        widget="monetary"
+                    />
+                    <div class="o_row">
+                        <field
+                            name="l10n_pt_remote_work_expense_computer_equipment"
+                            widget="monetary"
+                        />
+                        <span>/ day</span>
+                    </div>
+                </group>
+            </xpath>
+            <field name="date_start" position="before">
+                <field
+                    name="l10n_pt_first_contract_date"
+                    invisible="country_code != 'PT'"
+                />
+            </field>
+            <field name="hr_responsible_id" position="before">
+                <field
+                    name="l10n_pt_contract_type_ru"
+                    invisible="country_code != 'PT'"
+                />
+            </field>
+        </field>
+    </record>
+</odoo>
