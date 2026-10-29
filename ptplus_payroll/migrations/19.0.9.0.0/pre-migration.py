@@ -49,6 +49,32 @@ def _drop_redundant_wizard_view(env):
     ee.unlink()
 
 
+def _drop_stale_views(env):
+    """Drop stale views referencing fields renamed in 19.0 before data load.
+
+    ``relatorio_unico_statement_form`` inherits ``wizard_payroll_statement_form``
+    and its pre-19.0 arch references ``contract_id`` on
+    ``ru.extra.data.employee``, a field renamed to ``version_id`` in 19.0.
+    When ``wizards/payroll_statement.xml`` rewrites the parent view, Odoo
+    validates the combined arch and the still-stale child makes the module
+    update abort with a ParseError. The module recreates the view later in the
+    same load (``wizards/single_report_statement_views.xml``), so it is safe to
+    delete the view and its xmlid here.
+
+    ``report_slip_pt`` was the payslip report template in 18.0; it was renamed
+    to ``report_payslip_pt`` in 19.0, so its stale arch (``contract_id`` on
+    ``hr.payslip``) is never overwritten. Drop it as well.
+    """
+    openupgrade.delete_records_safely_by_xml_id(
+        env,
+        [
+            "ptplus_payroll.relatorio_unico_statement_form",
+            "ptplus_payroll.report_slip_pt",
+        ],
+        delete_childs=True,
+    )
+
+
 def _rename_employee_form(env):
     """Rename the _ee employee form view xmlid to avoid collision.
 
@@ -70,6 +96,8 @@ def _rename_employee_form(env):
 
 @openupgrade.migrate()
 def migrate(env, version):
+    _drop_stale_views(env)
+
     if not openupgrade.is_module_installed(env.cr, "ptplus_payroll_ee"):
         _logger.info("ptplus_payroll_ee is not installed; skipping merge migration.")
         return
