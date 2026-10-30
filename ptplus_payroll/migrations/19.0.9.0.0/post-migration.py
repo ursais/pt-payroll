@@ -18,15 +18,14 @@ def migrate(env, version):
         """
         UPDATE hr_salary_rule r
         SET active = true
-        FROM ir_model_data md
-        JOIN ir_model_data smd
-          ON smd.model = 'hr.payroll.structure'
-         AND smd.res_id = r.struct_id
-         AND smd.module = 'ptplus_payroll'
-         AND smd.name = 'hr_payroll_structure_pt_monthly_pay'
+        FROM ir_model_data md, ir_model_data smd
         WHERE md.model = 'hr.salary.rule'
           AND md.res_id = r.id
           AND md.module = '__export__'
+          AND smd.model = 'hr.payroll.structure'
+          AND smd.res_id = r.struct_id
+          AND smd.module = 'ptplus_payroll'
+          AND smd.name = 'hr_payroll_structure_pt_monthly_pay'
           AND r.code IN (
               'BASIC', 'ATTACH_SALARY', 'ASSIG_SALARY', 'CHILD_SUPPORT',
               'DEDUCTION', 'REIMBURSEMENT', 'GROSS', 'NET'
